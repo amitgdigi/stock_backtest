@@ -15,14 +15,17 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  username: <%= ENV.fetch("POSTGRES_USER") { "user1" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "psd123" } %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
+  host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 
 development:
   <<: *default
-  database: stock_backtest_development
+  database: <%= ENV.fetch("POSTGRES_NAME") { "stock_backtest_db" } %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
