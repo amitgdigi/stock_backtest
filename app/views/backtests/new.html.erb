@@ -1,0 +1,45 @@
+<div class="container mt-5">
+  <h1>New Backtest</h1>
+  <% if flash[:alert] %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
+  <%= form_with model: @backtest, class: 'row g-3' do |f| %>
+
+    <div class="col-md-6">
+      <%= f.label :ticker, 'Stock Ticker', class: 'form-label' %>
+      <%= f.text_field :ticker, class: 'form-control', required: true, placeholder: 'e.g., AAPL' %>
+    </div>
+
+    <div class="col-md-6">
+      <%= f.label :start_date, 'Start Date', class: 'form-label' %>
+      <%= f.date_field :start_date, class: 'form-control', required: true %>
+    </div>
+
+    <div class="col-md-6">
+      <%= f.label :end_date, 'End Date (optional)', class: 'form-label' %>
+      <%= f.date_field :end_date, class: 'form-control' %>
+    </div>
+
+    <div class="col-md-6">
+      <%= f.label :investment_amount, 'Investment Amount (₹)', class: 'form-label' %>
+      <%= f.number_field :investment_amount, class: 'form-control', required: true, step: 0.01 %>
+    </div>
+
+    <div class="col-md-4">
+      <%= f.label :sell_profit_percentage, 'Sell Profit %', class: 'form-label' %>
+      <%= f.number_field :sell_profit_percentage, class: 'form-control', required: true, step: 0.1 %>
+    </div>
+
+    <div class="col-md-4">
+      <%= f.label :buy_dip_percentage, 'Buy Dip %', class: 'form-label' %>
+      <%= f.number_field :buy_dip_percentage, class: 'form-control', required: true, step: 0.1 %>
+    </div>
+
+    <div class="col-md-4">
+      <%= f.label :reinvestment_percentage, 'Reinvestment %', class: 'form-label' %>
+      <%= f.number_field :reinvestment_percentage, class: 'form-control', required: true, step: 0.1 %>
+    </div>
+
+    <%= f.submit 'Run Backtest', class: 'btn btn-primary' %>
+  <% end %>
+</div>
