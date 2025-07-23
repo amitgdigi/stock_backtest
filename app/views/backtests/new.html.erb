@@ -3,11 +3,14 @@
   <% if flash[:alert] %>
     <div class="alert alert-danger"><%= flash[:alert] %></div>
   <% end %>
-  <%= form_with model: @backtest, class: 'row g-3' do |f| %>
+  <%= form_with model: @backtest, class: 'row g-3', local: true do |f| %>
 
     <div class="col-md-6">
       <%= f.label :ticker, 'Stock Ticker', class: 'form-label' %>
-      <%= f.text_field :ticker, class: 'form-control', required: true, placeholder: 'e.g., AAPL' %>
+      <%= f.select :ticker,
+                  options_from_collection_for_select(Stock.all, :ticker, :display_name, @backtest.stock&.ticker),
+                  { include_blank: 'Stock Name' },
+                  { class: 'form-control stock-ticker-select', required: true, data: { controller: 'stock-ticker' } } %>
     </div>
 
     <div class="col-md-6">
@@ -22,22 +25,27 @@
 
     <div class="col-md-6">
       <%= f.label :investment_amount, 'Investment Amount (₹)', class: 'form-label' %>
-      <%= f.number_field :investment_amount, class: 'form-control', required: true, step: 0.01 %>
+      <%= f.number_field :investment_amount, class: 'form-control', required: true, step: 1000, min: 0 %>
     </div>
 
     <div class="col-md-4">
       <%= f.label :sell_profit_percentage, 'Sell Profit %', class: 'form-label' %>
-      <%= f.number_field :sell_profit_percentage, class: 'form-control', required: true, step: 0.1 %>
+      <%= f.number_field :sell_profit_percentage, class: 'form-control', required: true, step: 1, min: 0 %>
     </div>
 
     <div class="col-md-4">
       <%= f.label :buy_dip_percentage, 'Buy Dip %', class: 'form-label' %>
-      <%= f.number_field :buy_dip_percentage, class: 'form-control', required: true, step: 0.1 %>
+      <%= f.number_field :buy_dip_percentage, class: 'form-control', required: true, step: 1, min: 0 %>
     </div>
 
     <div class="col-md-4">
       <%= f.label :reinvestment_percentage, 'Reinvestment %', class: 'form-label' %>
-      <%= f.number_field :reinvestment_percentage, class: 'form-control', required: true, step: 0.1 %>
+      <%= f.number_field :reinvestment_percentage, class: 'form-control', required: true, step: 5, min: 0 %>
+    </div>
+
+    <div class="col-md-4">
+      <%= f.label :maximum_buy_amount, 'Maximum Buy Amount %', class: 'form-label' %>
+      <%= f.number_field :maximum_buy_amount, class: 'form-control', step: 5000, min: 0 %>
     </div>
 
     <%= f.submit 'Run Backtest', class: 'btn btn-primary' %>
