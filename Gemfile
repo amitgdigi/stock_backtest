@@ -67,3 +67,5 @@ end
 
 # For Alpha Vantage API requests
 gem "httparty"
+gem "foreman"
+gem "tailwindcss-rails"
