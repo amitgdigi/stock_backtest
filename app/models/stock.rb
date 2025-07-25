@@ -16,4 +16,11 @@ class Stock < ApplicationRecord
   has_many :stock_prices, dependent: :destroy
   has_many :backtests, dependent: :destroy
   validates :ticker, presence: true, uniqueness: true
+
+  def display_name
+    {
+      id: ticker || "MARUTI.BSE",
+      text: name ? "#{ticker} - #{name}" : ticker
+    }
+  end
 end

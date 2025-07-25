@@ -18,11 +18,9 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "https://code.jquery.com/jquery-3.6.0.min.js" %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" %>
-    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" %>
+    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css", media: "all" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
 
   <body>

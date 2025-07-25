@@ -1,7 +1,8 @@
 class BacktestService
-  def initialize(backtest)
+  def initialize(backtest, max_buy_amount)
     @backtest = backtest
     @stock = backtest.stock
+    @max_buy_amount = max_buy_amount
     @investment_amount = backtest.investment_amount
     @portfolio = { shares: 0, cash: 0.0 }
     @transactions = []
@@ -10,14 +11,17 @@ class BacktestService
 
   def run
     # Fetch or use cached prices
-    prices = StockPrice.where(stock_id: @stock.id, date: @backtest.start_date..@backtest.end_date)
+    prices = @stock.stock_prices.where(date: @backtest.start_date..@backtest.end_date)
                       .order(:date)
                       .map { |p| { date: p.date, close_price: p.close_price } }
-    return { error: "No price data available" } if prices.empty?
+
+    [ @backtest.destroy, @stock.destroy, @transactions.destroy ] if prices.empty?
+
+    return { error: "No price data available, Please try later" } if prices.empty?
 
     # Initial buy
     first_price = prices.first[:close_price]
-    initial_quantity = (@investment_amount / first_price).to_i
+    initial_quantity = [ (@investment_amount / first_price).to_i, 1 ].max
     @portfolio[:shares] += initial_quantity
     @portfolio[:cash] -= initial_quantity * first_price
     @last_purchase_price = first_price
@@ -42,6 +46,8 @@ class BacktestService
       # Buy
       elsif price_change_percent <= -@backtest.buy_dip_percentage
         reinvest_amount = @portfolio[:shares] > 0 ? @portfolio[:cash].abs * (@backtest.reinvestment_percentage / 100) : @investment_amount
+        reinvest_amount = [ reinvest_amount, @max_buy_amount ].min if @max_buy_amount > 0
+
         quantity = [ (reinvest_amount / current_price).to_i, 1 ].max
         @portfolio[:shares] += quantity
         @portfolio[:cash] -= quantity * current_price
@@ -77,6 +83,7 @@ class BacktestService
 
   def save_transaction(type, date, price, quantity)
     amount = (quantity * price).round(2)
+
     @transactions << Transaction.create!(
       backtest_id: @backtest.id,
       transaction_type: type,

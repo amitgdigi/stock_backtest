@@ -2,6 +2,9 @@ class BacktestsController < ApplicationController
   def new
     @stocks = Stock.all
     @backtest = Backtest.new(
+      stock_id: @stocks.first&.id,
+      start_date: Date.current.beginning_of_year - 1.year,
+      end_date: Date.current.end_of_year - 1.year,
       investment_amount: 5000,
       sell_profit_percentage: 3.0,
       buy_dip_percentage: 6.0,
@@ -13,7 +16,6 @@ class BacktestsController < ApplicationController
     @backtest = Backtest.new(backtest_params)
 
     @backtest.end_date ||= @backtest.start_date + 30
-
     # Fetch prices
     result = AlphaVantageService.fetch_daily_prices(
       params[:backtest][:ticker],
@@ -28,13 +30,11 @@ class BacktestsController < ApplicationController
 
     @backtest.stock = result[:stock]
     if @backtest.save
-      # Run backtest
-      @result = BacktestService.new(@backtest).run
+      @result = BacktestService.new(@backtest, max_buy_amount).run
       if @result[:error]
         flash[:alert] = @result[:error]
         render :new, status: :unprocessable_entity
       else
-        # redirect_to @backtest, notice: "Backtest created successfully."
         redirect_to backtest_path(@backtest)
       end
     else
@@ -82,13 +82,13 @@ class BacktestsController < ApplicationController
 
     @backtest.stock = result[:stock]
     if @backtest.save
-      # Run backtest
-      @result = BacktestService.new(@backtest).run
+
+      @result = BacktestService.new(@backtest, max_buy_amount).run
       if @result[:error]
         flash[:alert] = @result[:error]
         render :new, status: :unprocessable_entity
       else
-        # render :show, status: :unprocessable_entity
+
         redirect_to backtest_path(@backtest)
       end
     else
@@ -98,15 +98,18 @@ class BacktestsController < ApplicationController
   end
 
   private
+    def max_buy_amount
+      params[:backtest][:maximum_buy_amount].to_i
+    end
 
-  def set_backtest
-    @backtest = Backtest.find(params[:id])
-  end
+    def set_backtest
+      @backtest = Backtest.find(params[:id])
+    end
 
-  def backtest_params
-    params.require(:backtest).permit(
-      :start_date, :end_date, :investment_amount,
-      :sell_profit_percentage, :buy_dip_percentage, :reinvestment_percentage
-    )
-  end
+    def backtest_params
+      params.require(:backtest).permit(
+        :start_date, :end_date, :investment_amount,
+        :sell_profit_percentage, :buy_dip_percentage, :reinvestment_percentage
+      )
+    end
 end
