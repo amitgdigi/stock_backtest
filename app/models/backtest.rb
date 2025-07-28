@@ -6,7 +6,7 @@
 #  buy_dip_percentage      :decimal(5, 2)    not null
 #  end_date                :date
 #  investment_amount       :decimal(15, 2)   not null
-#  reinvestment_percentage :decimal(5, 2)    not null
+#  reinvestment_percentage :decimal(5, 2)
 #  sell_profit_percentage  :decimal(5, 2)    not null
 #  start_date              :date             not null
 #  status                  :string           default("pending")
@@ -25,8 +25,7 @@
 class Backtest < ApplicationRecord
   belongs_to :stock
   has_many :transactions, dependent: :destroy
-  validates :start_date, :investment_amount, :sell_profit_percentage, :buy_dip_percentage, :reinvestment_percentage, presence: true
-  validates :investment_amount, :sell_profit_percentage, :buy_dip_percentage, :reinvestment_percentage, numericality: { greater_than: 0 }
-  validates :reinvestment_percentage, numericality: { less_than_or_equal_to: 100 }
+  validates :start_date, :investment_amount, :sell_profit_percentage, :buy_dip_percentage, presence: true
+  validates :investment_amount, :sell_profit_percentage, :buy_dip_percentage, numericality: { greater_than: 0 }
   validates :end_date, comparison: { greater_than: :start_date }, if: -> { end_date.present? }
 end

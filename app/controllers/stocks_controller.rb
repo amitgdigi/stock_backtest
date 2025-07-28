@@ -1,16 +1,34 @@
 class StocksController < ApplicationController
   protect_from_forgery except: :search
   def search
-    query = params[:query]
-    local_stocks = Stock.where("ticker ILIKE ? OR name ILIKE ?", "%#{query}%", "%#{query}%").limit(10)
+    query = params[:query].to_s.strip
 
-    api_stocks = (local_stocks.empty? && query.length >= 3) ? SearchStockService.fetch_stock_search(query) : []
+    @results = fetch_local_stocks(query)
 
-    @results = (local_stocks + api_stocks).uniq
+    if @results.empty? && query.length >= 3
+      @results = SearchStockService.fetch_stock_search(query) || []
+    end
+
+    @results.uniq! { |s| s[:ticker] }
 
     respond_to do |format|
       format.turbo_stream
       format.html { render :new }
     end
   end
+
+  private
+    def fetch_local_stocks(query)
+      return [] if query.blank?
+
+      Stock
+        .where("ticker ILIKE :q OR name ILIKE :q", q: "%#{query}%")
+        .limit(10)
+        .map do |s|
+          {
+            ticker: s.ticker,
+            name: s.name.present? ? "#{s.ticker} - #{s.name}" : s.ticker
+          }
+        end
+    end
 end

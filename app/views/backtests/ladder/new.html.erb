@@ -1,5 +1,5 @@
 <div class="max-w-3xl mx-auto mt-8 px-4">
-  <h1 class="text-2xl font-semibold mb-6 text-gray-800">New Backtest</h1>
+  <h1 class="text-2xl font-semibold mb-6 text-gray-800">Backtest Ladder strategy</h1>
 
   <% if flash[:alert] %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
@@ -7,19 +7,19 @@
     </div>
   <% end %>
 
-  <%= form_with model: @backtest, class: 'grid grid-cols-1 md:grid-cols-2 border border-gray-300 gap-6 bg-white p-6 rounded-lg shadow-2xl' do |f| %>
+  <%= form_with model: @backtest, url: backtests_ladder_index_path, method: :post, class: 'grid grid-cols-1 md:grid-cols-2 border border-gray-300 gap-6 bg-white p-6 rounded-lg shadow-2xl' do |f| %>
 
     <div>
       <div class="flex items-center mb-1">
         <%= f.label :ticker, 'Search Stock', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "tooltip-search", message: "Search for the stock which you want to backtest." %>
+        <%= render "backtests/tooltip", tooltip_id: "tooltip-search", message: "Search for the stock which you want to backtest." %>
       </div>
       <%= text_field_tag :ticker_search, nil, class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500', placeholder: 'Search for a ticker...', data: { url: stocks_search_path } %>
     </div>
     <div>
       <div class="flex items-center mb-1">
         <%= f.label :ticker, 'Select Stock', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "select-tip", message: "Select the stock, you want to backtest." %>
+        <%= render "backtests/tooltip", tooltip_id: "select-tip", message: "Select the stock, you want to backtest." %>
       </div>
       <%= f.select :ticker, 
                   options_from_collection_for_select(@recent_tested_stocks, :ticker, :display_name, @recent_tested_stocks.first&.ticker),
@@ -39,26 +39,8 @@
 
     <div>
       <div class="flex items-center mb-1">
-        <%= f.label :investment_amount, 'Investment Amount (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "invest-tip", message: "Set the initial investment amount to start investing." %>
-      </div>
-      <%= f.number_field :investment_amount, step: 1000, min: 0, required: true,
-            class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
-    </div>
-
-    <div>
-      <div class="flex items-center mb-1">
-        <%= f.label :maximum_buy_amount, 'Maximum Buy Amount (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "max-buy-tip", message: "Set the maximum buy amount at the time of averaging." %>
-      </div>
-      <%= f.number_field :maximum_buy_amount, value: 10000, step: 5000, min: 0,
-            class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
-    </div>
-
-    <div>
-      <div class="flex items-center mb-1">
         <%= f.label :sell_profit_percentage, 'Sell Profit (%)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "profit-tip", message: "Set the profit percentage to exit from the stock." %>
+        <%= render "backtests/tooltip", tooltip_id: "profit-tip", message: "Set the profit percentage to exit from the stock." %>
       </div>
       <%= f.number_field :sell_profit_percentage, step: 1, min: 0, required: true,
             class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
@@ -67,7 +49,7 @@
     <div>
       <div class="flex items-center mb-1">
         <%= f.label :buy_dip_percentage, 'Buy Dip (%)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "dip-tip", message: "Set the portfolio's percentage for the average." %>
+        <%= render "backtests/tooltip", tooltip_id: "dip-tip", message: "Set the portfolio's percentage for the average." %>
       </div>
       <%= f.number_field :buy_dip_percentage, step: 1, min: 0, required: true,
             class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
@@ -75,10 +57,10 @@
 
     <div>
       <div class="flex items-center mb-1">
-        <%= f.label :reinvestment_percentage, 'Reinvestment (%)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "reinvestment-tip", message: "Set the percentage of your portfolio to invest again to make average." %>
+        <%= f.label :investment_amount, 'Investment Amount (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
+        <%= render "backtests/tooltip", tooltip_id: "invest-tip", message: "Set the initial investment amount to start investing." %>
       </div>
-      <%= f.number_field :reinvestment_percentage, step: 5, min: 0, required: true,
+      <%= f.number_field :investment_amount, step: 1000, min: 0, required: true,
             class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
     </div>
 

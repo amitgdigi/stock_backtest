@@ -18,9 +18,6 @@ class Stock < ApplicationRecord
   validates :ticker, presence: true, uniqueness: true
 
   def display_name
-    {
-      id: ticker || "MARUTI.BSE",
-      text: name ? "#{ticker} - #{name}" : ticker
-    }
+    name.present? ? "#{ticker} - #{name}" : ticker
   end
 end
