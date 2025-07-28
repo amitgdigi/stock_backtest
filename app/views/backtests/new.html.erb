@@ -22,7 +22,7 @@
         <%= render "tooltip", tooltip_id: "select-tip", message: "Select the stock, you want to backtest." %>
       </div>
       <%= f.select :ticker, 
-                  options_from_collection_for_select(Stock.order(id: :desc).limit(10), :ticker, :display_name, Stock.last&.ticker),
+                  options_from_collection_for_select(@recent_tested_stocks, :ticker, :display_name, @recent_tested_stocks.first&.ticker),
                   { include_blank: 'Select a stock...' },
                   { class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 stock-ticker-select', required: true, id: 'ticker-select' } %>
     </div>

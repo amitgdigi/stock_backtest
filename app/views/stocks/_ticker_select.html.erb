@@ -1,5 +1,5 @@
 <%= select_tag :ticker, 
-               options_from_collection_for_select(stocks, :ticker, :display_name, stocks.first&.ticker),
+               options_for_select(stocks.map { |s| [s[:name], s[:ticker]] }, stocks.first&.[](:ticker)),
                {include_blank: 'Select a Stock...',
                class: 'block w-full border-2 border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500',
                required: true,

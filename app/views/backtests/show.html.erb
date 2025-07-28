@@ -39,8 +39,8 @@
             <tr class="hover:bg-gray-100 transition">
               <td class="px-4 py-2"><%= txn.date %></td>
               <td class="px-4 py-2 capitalize"><%= txn.transaction_type %></td>
-              <td class="px-4 py-2">₹<%= txn.price %></td>
-              <td class="px-4 py-2"><%= txn.quantity %></td>
+              <td class="px-4 py-2"><%= txn.price %></td>
+              <td class="px-8 py-2"><%= txn.quantity %></td>
               <td class="px-4 py-2">
                 <% amt = number_with_precision(txn.amount, precision: 2) %>
                 <% if txn.transaction_type == "sell" %>
