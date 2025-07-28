@@ -1,0 +1,30 @@
+<div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+  <h1 class="text-4xl font-bold text-gray-800 mb-4">📊 Stock Backtest Dashboard</h1>
+  <p class="text-lg text-gray-600 mb-10 text-center max-w-xl">
+    Choose one of the strategies below to run a backtest. These strategies help you analyze how a stock would have performed historically using different trading rules.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+    <!-- Strategy 1 -->
+    <%= link_to 'Moving Average Crossover', new_backtest_path, class: "bg-blue-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-blue-700 transition" %>
+
+    <!-- Strategy 2 -->
+    <%= link_to 'RSI Reversal', new_backtest_path,
+    #  backtests_path(strategy: 'rsi_reversal'), 
+     class: "bg-green-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-green-700 transition" %>
+
+    <!-- Strategy 3 -->
+    <%= link_to 'Breakout Strategy', new_backtest_path,
+    #  backtests_path(strategy: 'breakout'), 
+     class: "bg-purple-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-purple-700 transition" %>
+
+    <!-- Strategy 4 -->
+    <%= link_to 'Bollinger Band Mean Reversion', new_backtest_path,
+    #  backtests_path(strategy: 'bollinger'), 
+     class: "bg-yellow-500 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-yellow-600 transition" %>
+  </div>
+
+  <div class="mt-12 text-sm text-gray-500">
+    Last updated: <%= Time.current.strftime("%B %d, %Y") %>
+  </div>
+</div>

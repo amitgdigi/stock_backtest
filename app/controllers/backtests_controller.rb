@@ -1,17 +1,23 @@
 class BacktestsController < ApplicationController
   def new
+    @recent_tested_stocks = Backtest.order(id: :desc).limit(30).includes(:stock).map(&:stock).uniq.first(10)
+    backtest = Backtest.last
     @backtest = Backtest.new(
-      stock_id: Backtest.last&.stock&.id,
-      start_date: Date.current.beginning_of_year - 1.year,
-      end_date: Date.current.end_of_year - 1.year,
-      investment_amount: 5000,
-      sell_profit_percentage: 3.0,
-      buy_dip_percentage: 6.0,
-      reinvestment_percentage: 50.0
+      stock_id: @recent_tested_stocks.first&.id,
+      start_date: backtest&.start_date || Date.current.beginning_of_year - 1.year,
+      end_date: backtest&.end_date || Date.today,
+      investment_amount: backtest&.investment_amount.to_i || 5000,
+      sell_profit_percentage: backtest&.sell_profit_percentage.to_i || 10,
+      buy_dip_percentage: backtest&.buy_dip_percentage.to_i || 10,
+      reinvestment_percentage: backtest&.reinvestment_percentage.to_i || 50
     )
   end
 
   def create
+    if available_backtest = Backtest.find_by(backtest_params.merge(status: :completed))
+      return redirect_to backtest_path(available_backtest)
+    end
+
     backtest = Backtest.new(backtest_params)
     backtest.end_date ||= backtest.start_date + 30
     # Fetch prices
