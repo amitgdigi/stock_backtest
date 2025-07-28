@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_21_154836) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_081546) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,7 +21,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_21_154836) do
     t.decimal "investment_amount", precision: 15, scale: 2, null: false
     t.decimal "sell_profit_percentage", precision: 5, scale: 2, null: false
     t.decimal "buy_dip_percentage", precision: 5, scale: 2, null: false
-    t.decimal "reinvestment_percentage", precision: 5, scale: 2, null: false
+    t.decimal "reinvestment_percentage", precision: 5, scale: 2
     t.string "status", default: "pending"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_21_154836) do
     t.decimal "amount", precision: 15, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "open", default: true
     t.index ["backtest_id"], name: "index_transactions_on_backtest_id"
   end
 

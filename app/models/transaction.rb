@@ -5,6 +5,7 @@
 #  id               :bigint           not null, primary key
 #  amount           :decimal(15, 2)   not null
 #  date             :date             not null
+#  open             :boolean          default(TRUE)
 #  price            :decimal(10, 2)   not null
 #  quantity         :integer          not null
 #  transaction_type :string           not null
