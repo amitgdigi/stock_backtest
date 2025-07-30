@@ -1,0 +1,151 @@
+<div data-controller="view-toggle" >
+  <div class="p-2 mb-6">
+    <div class="flex flex-wrap gap-2 justify-end mb-4">
+    <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center gap-2", id: "ipo-filter-form", data: { controller: "filter-persist" } do %>
+      <select
+        name="issue_type"
+        id="issue_type"
+        class="py-2 border rounded-lg text-sm text-gray-700"
+        data-filter-persist-target="issueType"
+        data-action="change->filter-persist#submitForm">
+        <option value="">All</option>
+        <option value="SME" <%= "selected" if params[:issue_type] == "SME" %>>SME</option>
+        <option value="Mainboard" <%= "selected" if params[:issue_type] == "Mainboard" %>>Mainboard</option>
+      </select>
+      <select
+        name="year"
+        id="year"
+        class="p-2 border rounded-lg text-sm text-gray-700"
+        data-filter-persist-target="year"
+        data-action="change->filter-persist#submitForm">
+        <option value="2025" <%= "selected" if params[:year] == "2025" %>>2025</option>
+        <option value="2024" <%= "selected" if params[:year] == "2024" %>>2024</option>
+        <option value="2024-25" <%= "selected" if params[:year] == "2024-25" %>>2024-25</option>
+        <option value="2023" <%= "selected" if params[:year] == "2023" %>>2023</option>
+        <option value="2023-25" <%= "selected" if params[:year] == "2023-25" %>>2023-25</option>
+        <option value="2022" <%= "selected" if params[:year] == "2022" %>>2022</option>
+        <option value="2022-25" <%= "selected" if params[:year] == "2022-25" %>>2022-25</option>
+      </select>
+      <% end %>
+      <div class="flex items-center gap-2">
+        <button
+          data-action="click->view-toggle#showGrid"
+          class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-blue-600 text-white">
+          Grid
+        </button>
+        <button
+          data-action="click->view-toggle#showList"
+          class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100">
+          List
+        </button>
+      </div>
+    </div>
+
+    <div data-view-toggle-target="grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <% @ipo_list.each do |item| %>
+          <div class="hover:bg-gray-100 border border-gray-200 shadow-lg rounded-2xl p-4">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2"><%= item["Company"] %></h2>
+            <p class="text-xs text-gray-500 mb-3">
+              <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"><%= item["Issue Type"] %></span>
+              <span class="ml-2"><strong>Listed:</strong> <%= item["Listing Date"] %></span>
+            </p>
+
+            <!-- Price Section -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3 text-sm">
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">Issue Price</p>
+                <p class="text-lg font-medium text-blue-700"><%= item["Issue Price (Rs.)"] %></p>
+              </div>
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">Listing Price</p>
+                <p class="text-lg font-medium text-green-700"><%= item["Close Price on Listing (Rs.)"] %></p>
+              </div>
+              <div class="p-2 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">Market Price</p>
+                <p class="text-lg font-medium text-purple-700"><%= item["Market Price (Rs.)"] %></p>
+              </div>
+            </div>
+
+            <!-- 52 Week High/Low Section -->
+            <div class="flex justify-between text-sm mb-3">
+              <div class="w-1/2 pr-1">
+                <p class="text-gray-500">52W High</p>
+                <p class="text-green-600 font-medium"><%= item["52 Week High"].presence || "N/A" %></p>
+              </div>
+              <div class="w-1/2 pl-1">
+                <p class="text-gray-500">52W Low</p>
+                <p class="text-red-600 font-medium"><%= item["52 Week Low"].presence || "N/A" %></p>
+              </div>
+            </div>
+
+            <!-- Issue Amount & Recommendation -->
+            <div class="flex justify-between items-center text-sm">
+              <div>
+                <p class="text-gray-500">Issue Amt</p>
+                <p class="font-semibold text-gray-700"><%= item["Issue Amount (Rs.cr.)"] %> Cr</p>
+              </div>
+              <div>
+                <% recommendation = item["Recommendation by Dilip Davda"] %>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-medium
+                  <%= recommendation&.downcase&.include?("apply") ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800" %>">
+                  <%= recommendation %>
+                </span>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div data-view-toggle-target="list" class="overflow-x-auto rounded-lg shadow-sm">
+      <table class="min-w-full divide-y border border-gray-200 text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Company</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Issue Amt cr.</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Issue Price</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Listing Price</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">52W High / Low</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Market Price</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-700">Type / Recommendation</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 bg-white">
+          <% @ipo_list.each do |item| %>
+            <tr class="hover:bg-gray-100 transition">
+              <td class="px-4 py-3 font-medium text-gray-800"><%= item["Company"] %></td>
+              <td class="px-4 py-3 text-gray-700"><%= item["Issue Amount (Rs.cr.)"] %></td>
+              <td class="px-4 py-3 text-gray-700"><%= item["Issue Price (Rs.)"] %></td>
+              <td class="px-4 py-3 text-gray-700"><%= item["Close Price on Listing (Rs.)"] %></td>
+              <td class="px-4 py-3 text-gray-700 flex gap-1 items-center">
+                <% 
+                  high = item["52 Week High"]
+                  low  = item["52 Week Low"]
+
+                  if high.present? && low.present?
+                    high_price, high_date = high.split(" ", 2)
+                    low_price,  low_date  = low.split(" ", 2)
+                %>
+                  <%= render "tooltip", tooltip_id: "high-#{item['Company']}", price: high_price, date: high_date %>
+                  <span>/</span>
+                  <%= render "tooltip", tooltip_id: "low-#{item['Company']}", price: low_price, date: low_date %>
+                <% else %>
+                  N/A
+                <% end %>
+              </td>
+              <% growth = item["Close Price on Listing (Rs.)"].split(" ", 2).first&.gsub(",", "").to_f - item["Market Price (Rs.)"].split(" ", 2).first&.gsub(",", "").to_f %>
+              <td class="px-4 py-3 font-semibold <%= growth <= 0 ? 'text-green-600' : 'text-red-600' %>">
+                <%= item["Market Price (Rs.)"].presence || "N/A" %>
+              </td>
+              <td class="px-4 py-3 text-gray-600">
+                <%= item["Issue Type"] %> / <%= item["Recommendation by Dilip Davda"].presence || "N/A" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
