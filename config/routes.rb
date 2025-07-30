@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   end
 
   get "stocks/search", to: "stocks#search"
+  get "stocks/ipo", to: "stocks#ipo"
 
   root "home#index"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
