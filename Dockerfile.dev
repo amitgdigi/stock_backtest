@@ -1,0 +1,40 @@
+# Use the official Ruby 3.2.2 image as the base
+FROM ruby:3.2.2
+
+# Install dependencies
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  libpq-dev \
+  nodejs \
+  npm \
+  && npm install -g yarn \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install specific Bundler version
+RUN gem install bundler -v 2.6.9
+
+# Copy Gemfile, Gemfile.lock, and vendor/cache (if it exists)
+COPY Gemfile Gemfile.lock ./
+COPY vendor/cache ./vendor/cache
+
+# Install Ruby gems, preferring local cache but falling back to RubyGems if needed
+RUN bundle config set --global jobs 4 && bundle install
+
+# Copy the rest of the application code
+COPY . .
+
+# Install JavaScript dependencies
+RUN yarn install
+
+# Precompile assets (optional for development, comment out if not needed)
+# RUN bundle exec rails assets:precompile
+
+# Expose port 3000 for the Rails server
+EXPOSE 3000
+
+# Start the Rails server
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

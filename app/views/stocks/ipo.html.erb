@@ -1,43 +1,48 @@
 <div data-controller="view-toggle" >
   <div class="p-2 mb-6">
-    <div class="flex flex-wrap gap-2 justify-end mb-4">
-    <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center gap-2", id: "ipo-filter-form", data: { controller: "filter-persist" } do %>
-      <select
-        name="issue_type"
-        id="issue_type"
-        class="py-2 border rounded-lg text-sm text-gray-700"
-        data-filter-persist-target="issueType"
-        data-action="change->filter-persist#submitForm">
-        <option value="">All</option>
-        <option value="SME" <%= "selected" if params[:issue_type] == "SME" %>>SME</option>
-        <option value="Mainboard" <%= "selected" if params[:issue_type] == "Mainboard" %>>Mainboard</option>
-      </select>
-      <select
-        name="year"
-        id="year"
-        class="p-2 border rounded-lg text-sm text-gray-700"
-        data-filter-persist-target="year"
-        data-action="change->filter-persist#submitForm">
-        <option value="2025" <%= "selected" if params[:year] == "2025" %>>2025</option>
-        <option value="2024" <%= "selected" if params[:year] == "2024" %>>2024</option>
-        <option value="2024-25" <%= "selected" if params[:year] == "2024-25" %>>2024-25</option>
-        <option value="2023" <%= "selected" if params[:year] == "2023" %>>2023</option>
-        <option value="2023-25" <%= "selected" if params[:year] == "2023-25" %>>2023-25</option>
-        <option value="2022" <%= "selected" if params[:year] == "2022" %>>2022</option>
-        <option value="2022-25" <%= "selected" if params[:year] == "2022-25" %>>2022-25</option>
-      </select>
-      <% end %>
-      <div class="flex items-center gap-2">
-        <button
-          data-action="click->view-toggle#showGrid"
-          class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-blue-600 text-white">
-          Grid
-        </button>
-        <button
-          data-action="click->view-toggle#showList"
-          class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100">
-          List
-        </button>
+    <div class="flex justify-between gap-2 mb-4">
+      <div class="flex flex-wrap gap-2 justify-start py-2 mb-4">
+        <%= link_to 'HOME', root_path, class: 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition' %>
+      </div>
+      <div class="flex flex-wrap gap-2 justify-end mb-4">
+        <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center gap-2", id: "ipo-filter-form", data: { controller: "filter-persist" } do %>
+        <select
+          name="issue_type"
+          id="issue_type"
+          class="py-2 border rounded-lg text-sm text-gray-700"
+          data-filter-persist-target="issueType"
+          data-action="change->filter-persist#submitForm">
+          <option value="">All</option>
+          <option value="SME" <%= "selected" if params[:issue_type] == "SME" %>>SME</option>
+          <option value="Mainboard" <%= "selected" if params[:issue_type] == "Mainboard" %>>Mainboard</option>
+        </select>
+        <select
+          name="year"
+          id="year"
+          class="p-2 border rounded-lg text-sm text-gray-700"
+          data-filter-persist-target="year"
+          data-action="change->filter-persist#submitForm">
+          <option value="2025" <%= "selected" if params[:year] == "2025" %>>2025</option>
+          <option value="2024" <%= "selected" if params[:year] == "2024" %>>2024</option>
+          <option value="2024-25" <%= "selected" if params[:year] == "2024-25" %>>2024-25</option>
+          <option value="2023" <%= "selected" if params[:year] == "2023" %>>2023</option>
+          <option value="2023-25" <%= "selected" if params[:year] == "2023-25" %>>2023-25</option>
+          <option value="2022" <%= "selected" if params[:year] == "2022" %>>2022</option>
+          <option value="2022-25" <%= "selected" if params[:year] == "2022-25" %>>2022-25</option>
+        </select>
+        <% end %>
+        <div class="flex items-center gap-2">
+          <button
+            data-action="click->view-toggle#showGrid"
+            class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-blue-600 text-white">
+            Grid
+          </button>
+          <button
+            data-action="click->view-toggle#showList"
+            class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100">
+            List
+          </button>
+        </div>
       </div>
     </div>
 

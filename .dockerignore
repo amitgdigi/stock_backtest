@@ -4,11 +4,10 @@
 /.git/
 /.gitignore
 
-# Ignore bundler config.
-/.bundle
-
 # Ignore all environment files.
-/.env*
+/.env
+!/.env.docker
+/.env.sample
 
 # Ignore all default key files.
 /config/master.key
@@ -17,25 +16,48 @@
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
-!/log/.keep
-!/tmp/.keep
-
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/.keep
-
-# Ignore storage (uploaded files in development and any SQLite databases).
 /storage/*
-!/storage/.keep
-/tmp/storage/*
-!/tmp/storage/.keep
+/public/assets/
+/app/assets/builds/*
 
-# Ignore assets.
+!log/.keep
+!tmp/.keep
+!tmp/pids/
+!tmp/pids/.keep
+!storage/.keep
+!app/assets/builds/.keep
+
+# -----------------------------
+# Assets - Ignore node_modules, but not vendor/bundle if needed
 /node_modules/
+.yarn/
+.yarn-cache/
 /app/assets/builds/*
 !/app/assets/builds/.keep
-/public/assets
+/public/assets/
 
+# -----------------------------
+# Ruby/Bundler
+# DO NOT ignore vendor/ or .bundle if you want to copy local bundle
+# .bundle/
+# vendor/              <-- Don't ignore these if copying from host
+# If you want to keep only bundled gems:
+# vendor/cache/        <-- optionally ignore this if not using bundle package
+
+# -----------------------------
+# Editor/IDE/OS junk
+*.swp
+.DS_Store
+.idea/
+.vscode/
+
+# -----------------------------
+# Debug logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# -----------------------------
 # Ignore CI service files.
 /.github
 

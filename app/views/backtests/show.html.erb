@@ -1,7 +1,10 @@
 <div class="container max-w-4xl mx-auto mt-10 px-4">
-  <h1 class="text-2xl font-bold text-gray-800 mb-4">
-    Backtest Results for <span class="text-blue-600"><%= @backtest.stock.ticker %></span>
-  </h1>
+  <div class="flex justify-between gap-2 mb-4">
+    <h1 class="flex items-center text-2xl font-semibold text-gray-800">Backtest Results for <span class="px-1 text-blue-600"><%= @backtest.stock.ticker %></span></h1>
+    <div class="flex flex-wrap gap-2 items-center justify-start">
+      <%= link_to 'Home', root_path, class: 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition' %>
+    </div>
+  </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-200 text-sm text-gray-700 bg-white rounded-md shadow-md p-6 mb-6">
     <div><strong>Start Date:</strong> <%= @backtest.start_date %></div>
@@ -18,6 +21,7 @@
     <div><strong>Total Charges:</strong> ₹<%= number_with_precision(@result[:charges], precision: 2) %></div>
   </div>
 
+  <h3 class="text-l font-semibold flex justify-center text-gray-800">Averaging Down with Fixed Profit</h2>
   <h2 class="text-xl font-semibold text-gray-800 mb-3">Transactions</h2>
 
   <% if @result[:transactions].empty? %>
