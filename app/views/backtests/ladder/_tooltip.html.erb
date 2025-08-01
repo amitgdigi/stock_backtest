@@ -1,9 +1,9 @@
-<span data-tooltip-target="<%= tooltip_id %>"
+<button data-tooltip-target="<%= tooltip_id %>" type="button" 
   class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600 mx-2">
   <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9 8a1 1 0 102 0 1 1 0 00-2 0zm2 2a1 1 0 10-2 0v4a1 1 0 102 0v-4z" clip-rule="evenodd" />
   </svg>
-</span>
+</button>
 <div id="<%= tooltip_id %>" role="tooltip" 
   class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-400 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700">
   <%= message %>

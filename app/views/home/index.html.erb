@@ -6,20 +6,20 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
     <!-- Strategy 1 -->
-    <%= link_to 'Moving Average Crossover', new_backtest_path, class: "bg-blue-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-blue-700 transition" %>
+    <%= link_to 'Averaging Down with Fixed Profit', new_backtest_path, class: "bg-blue-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-blue-700 transition" %>
 
     <!-- Strategy 2 -->
-    <%= link_to 'RSI Reversal', new_backtest_path,
+    <%= link_to 'Ladder Strategy', new_backtests_ladder_path,
     #  backtests_path(strategy: 'rsi_reversal'), 
      class: "bg-green-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-green-700 transition" %>
 
     <!-- Strategy 3 -->
-    <%= link_to 'Breakout Strategy', new_backtest_path,
+    <%= link_to 'List out IPOs', stocks_ipo_path,
     #  backtests_path(strategy: 'breakout'), 
      class: "bg-purple-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-purple-700 transition" %>
 
     <!-- Strategy 4 -->
-    <%= link_to 'Bollinger Band Mean Reversion', new_backtest_path,
+    <%= link_to 'Upcoming Strategy', root_path,
     #  backtests_path(strategy: 'bollinger'), 
      class: "bg-yellow-500 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-yellow-600 transition" %>
   </div>
