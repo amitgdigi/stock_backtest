@@ -80,8 +80,6 @@ GEM
     ast (2.4.3)
     base64 (0.3.0)
     bcrypt_pbkdf (1.1.1)
-    bcrypt_pbkdf (1.1.1-arm64-darwin)
-    bcrypt_pbkdf (1.1.1-x86_64-darwin)
     benchmark (0.4.1)
     bigdecimal (3.2.2)
     bindex (0.8.1)
@@ -142,7 +140,7 @@ GEM
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    json (2.13.0)
+    json (2.13.2)
     kamal (2.7.0)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -187,34 +185,14 @@ GEM
       net-protocol
     net-ssh (7.3.0)
     nio4r (2.7.4)
-    nokogiri (1.18.9-aarch64-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.18.9-aarch64-linux-musl)
-      racc (~> 1.4)
-    nokogiri (1.18.9-arm-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.18.9-arm-linux-musl)
-      racc (~> 1.4)
-    nokogiri (1.18.9-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.18.9-x86_64-darwin)
-      racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.18.9-x86_64-linux-musl)
       racc (~> 1.4)
     ostruct (0.6.3)
     parallel (1.27.0)
-    parser (3.3.8.0)
+    parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    pg (1.6.1)
-    pg (1.6.1-aarch64-linux)
-    pg (1.6.1-aarch64-linux-musl)
-    pg (1.6.1-arm64-darwin)
-    pg (1.6.1-x86_64-darwin)
     pg (1.6.1-x86_64-linux)
-    pg (1.6.1-x86_64-linux-musl)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -273,11 +251,11 @@ GEM
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
-    regexp_parser (2.10.0)
+    regexp_parser (2.11.0)
     reline (0.6.2)
       io-console (~> 0.5)
     rexml (3.4.1)
-    rubocop (1.78.0)
+    rubocop (1.79.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -285,7 +263,7 @@ GEM
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 2.9.3, < 3.0)
-      rubocop-ast (>= 1.45.1, < 2.0)
+      rubocop-ast (>= 1.46.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.46.0)
@@ -343,19 +321,9 @@ GEM
     tailwindcss-rails (4.3.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
-    tailwindcss-ruby (4.1.11)
-    tailwindcss-ruby (4.1.11-aarch64-linux-gnu)
-    tailwindcss-ruby (4.1.11-aarch64-linux-musl)
-    tailwindcss-ruby (4.1.11-arm64-darwin)
-    tailwindcss-ruby (4.1.11-x86_64-darwin)
     tailwindcss-ruby (4.1.11-x86_64-linux-gnu)
-    tailwindcss-ruby (4.1.11-x86_64-linux-musl)
     thor (1.4.0)
-    thruster (0.1.14)
-    thruster (0.1.14-aarch64-linux)
-    thruster (0.1.14-arm64-darwin)
-    thruster (0.1.14-x86_64-darwin)
-    thruster (0.1.14-x86_64-linux)
+    thruster (0.1.15-x86_64-linux)
     timeout (0.4.3)
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
@@ -382,16 +350,7 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
-  aarch64-linux
-  aarch64-linux-gnu
-  aarch64-linux-musl
-  arm-linux-gnu
-  arm-linux-musl
-  arm64-darwin
-  x86_64-darwin
   x86_64-linux
-  x86_64-linux-gnu
-  x86_64-linux-musl
 
 DEPENDENCIES
   annotaterb
@@ -422,4 +381,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   2.6.9
+   2.7.1
