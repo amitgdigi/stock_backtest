@@ -2,11 +2,12 @@
 #
 # Table name: stocks
 #
-#  id         :bigint           not null, primary key
-#  name       :string
-#  ticker     :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id           :bigint           not null, primary key
+#  listing_date :date
+#  name         :string
+#  ticker       :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
 #
 # Indexes
 #
