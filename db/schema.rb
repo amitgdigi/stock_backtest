@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_28_081546) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_05_082534) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_081546) do
     t.string "status", default: "pending"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "maximum_buy_amount", precision: 10, scale: 2
     t.index ["stock_id"], name: "index_backtests_on_stock_id"
   end
 
@@ -47,6 +48,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_081546) do
     t.string "ticker"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "listing_date"
     t.index ["ticker"], name: "index_stocks_on_ticker", unique: true
   end
 

@@ -11,22 +11,18 @@ class LadderStrategyService
   end
 
   def run
-    prices = @stock.stock_prices.where(date: @strategy.start_date..@strategy.end_date)
-                     .order(:date)
-                     .map { |p| { date: p.date, close_price: p.close_price } }
+    prices = @stock.stock_prices
+                   .where(date: @strategy.start_date..@strategy.end_date)
+                   .order(:date)
+                   .pluck(:date, :close_price)
 
-    [ @strategy.destroy, @transactions.destroy ] if prices.empty?
-    return { error: "No price data available, Please try later" } if prices.empty?
+    return cleanup_and_fail("No price data available, Please try later") if prices.empty?
 
-    @last_traded_price = prices.first[:close_price]
-    open_ladder(@last_traded_price, prices.first[:date]) # Initial buy
+    @last_traded_price = prices.first[1]
+    open_ladder(@last_traded_price, prices.first[0]) # Initial buy
 
-
-    prices[1..-1].each do |price_data|
-      current_price = price_data[:close_price]
-      date = price_data[:date]
-
-      handle_stock_split if @last_traded_price > (current_price*1.9)
+    prices.drop(1).each do |date, current_price|
+      handle_stock_split if @last_traded_price > current_price * 1.9
 
       # Sell
       @active_ladders.dup.each do |ladder|
@@ -37,10 +33,8 @@ class LadderStrategyService
 
       # Buy
       @last_traded_price = [ @last_traded_price, current_price ].max
-      if @last_traded_price
-        if price_down_from?(@last_traded_price, current_price, @buy_dip_percentage)
-          open_ladder(current_price, date)
-        end
+      if price_down_from?(@last_traded_price, current_price, @buy_dip_percentage)
+        open_ladder(current_price, date)
       end
     end
 
@@ -53,45 +47,53 @@ class LadderStrategyService
 
   private
 
+  def cleanup_and_fail(msg)
+    @strategy.destroy
+    @transactions.each(&:destroy)
+    { error: msg }
+  end
+
   def open_ladder(price, date)
     quantity = quantity_on_amount(price)
+    transaction = build_transaction("buy", date, price, quantity)
 
-    save_transaction("buy", date, price, quantity)
-    @active_ladders << { id: @transactions.last.id, price:, quantity: }
-  end
-
-  def sell_ladder(ladder, date, price)
-    save_transaction("sell", date, price, ladder[:quantity])
-    close_transaction(ladder[:id])
-    @active_ladders.delete(ladder)
-  end
-
-  def close_transaction(id)
-    Transaction.find_by(id:).update(open: false)
-  end
-
-  def quantity_on_amount(price)
-    (@investment_amount/price).to_i
-  end
-
-  def handle_stock_split
-    @last_traded_price = @last_traded_price / 2
-    @transactions.each do |t|
-      t.update(price: t.price/2, quantity: t.quantity*2)
+    if transaction.save
+      @transactions << transaction
+      @active_ladders << { id: transaction.id, price: price, quantity: quantity }
     end
   end
 
-  def save_transaction(type, date, price, quantity)
-    amount = (quantity * price).round(2)
-    @last_traded_price = price
+  def sell_ladder(ladder, date, price)
+    transaction = build_transaction("sell", date, price, ladder[:quantity])
 
-    @transactions << Transaction.create!(
+    if transaction.save
+      @transactions << transaction
+      close_transaction(ladder[:id])
+      @active_ladders.delete(ladder)
+    end
+  end
+
+  def close_transaction(id)
+    Transaction.where(id: id).update_all(open: false) # Faster than find + update
+  end
+
+  def quantity_on_amount(price)
+    (@investment_amount / price).to_i
+  end
+
+  def handle_stock_split
+    @last_traded_price /= 2
+    @transactions.each { |t| t.update(price: t.price / 2, quantity: t.quantity * 2) }
+  end
+
+  def build_transaction(type, date, price, quantity)
+    Transaction.new(
       backtest_id: @strategy.id,
       transaction_type: type,
       date: date,
       price: price,
       quantity: quantity,
-      amount: amount
+      amount: (quantity * price).round(2)
     )
   end
 
