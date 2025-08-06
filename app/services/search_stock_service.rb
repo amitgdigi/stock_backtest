@@ -16,7 +16,7 @@ class SearchStockService
     data = JSON.parse(response.body, symbolize_names: true)
     return [] unless data[:symbols]
 
-    data[:symbols].map do |match|
+    data[:symbols].filter{|s| s[:'listing_date'].to_date < Date.tomorrow}.map do |match|
       Stock.new(
         ticker: match[:'symbol'],
         name: match[:'symbol_info'],

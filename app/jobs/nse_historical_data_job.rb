@@ -29,7 +29,7 @@ class NseHistoricalDataJob < ApplicationJob
         to: current_to.strftime("%d-%m-%Y"),
         symbol:,
         type: "priceVolumeDeliverable",
-        series: "ALL"
+        series: "EQ"
       }, headers: HEADERS)
 
 
@@ -54,7 +54,6 @@ class NseHistoricalDataJob < ApplicationJob
 
   def extract_prices(data_rows, stock_id)
     data_rows.map do |values|
-      next unless values[:CH_SERIES] == "EQ"
 
       begin
         {

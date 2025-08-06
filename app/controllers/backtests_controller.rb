@@ -16,7 +16,7 @@ class BacktestsController < ApplicationController
     @backtest = build_backtest(stock)
     unless stock&.stock_prices&.present?
       NseHistoricalDataJob.perform_later(symbol)
-      return redirect_to new_backtest_path, notice: "Records are being fetched. Please try again after a few moments.\n\nPlease wait at least 2 minutes\n \nCollecting 5 Year record"
+      return redirect_to new_backtest_path, notice: "Records are being fetched. Please try again after a few moments.\n\nPlease wait at least 2 minutes.\n \nCollecting 5 Year record"
     end
 
     @backtest.end_date ||= @backtest.start_date + 30
@@ -42,7 +42,7 @@ class BacktestsController < ApplicationController
     profit_loss = backtest.transactions.sold.present? ? ((backtest.transactions - backtest.transactions.unsold_stocks).sum { |t| t.transaction_type == "sell" ? t.amount : -t.amount }) : 0
     final_shares = backtest.transactions.sum { |t| t.transaction_type == "buy" ? t.quantity : -t.quantity }
     invested_amount = backtest.transactions.unsold_stocks.sum(&:amount)
-    charges = (backtest.transactions.sum(&:amount) * 0.0023) + backtest.transactions.sold.count * 16
+    charges = (backtest.transactions.sum(&:amount) * 0.003321) + backtest.transactions.sold.count * 16
 
     @backtest=backtest
     @result = {

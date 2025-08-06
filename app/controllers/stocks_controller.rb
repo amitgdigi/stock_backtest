@@ -5,7 +5,7 @@ class StocksController < ApplicationController
 
     @results = fetch_local_stocks(query)
 
-    if @results.empty? && query.length >= 3
+    if @results.empty? && query.length > 2
       @results = SearchStockService.fetch_stock_search(query) || []
     end
 

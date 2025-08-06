@@ -15,7 +15,7 @@ RUN apt-get update -qq && apt-get install -y \
 WORKDIR /app
 
 # Install specific Bundler version
-RUN gem install bundler -v 2.6.9
+RUN gem install bundler -v 2.7.1
 
 # Copy Gemfile, Gemfile.lock, and vendor/cache (if it exists)
 COPY Gemfile Gemfile.lock ./
