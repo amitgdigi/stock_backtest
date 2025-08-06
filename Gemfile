@@ -64,7 +64,6 @@ group :test do
   gem "selenium-webdriver"
 end
 
-# For Alpha Vantage API requests
 gem "httparty"
 gem "foreman"
 gem "tailwindcss-rails"
