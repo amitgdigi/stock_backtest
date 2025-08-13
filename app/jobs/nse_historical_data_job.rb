@@ -18,7 +18,7 @@ class NseHistoricalDataJob < ApplicationJob
     stock = Stock.find_or_create_by(ticker: symbol.upcase)
 
     fetch_symbol_name(stock) if stock.name.nil? || stock.listing_date.nil?
-    return if stock&.stock_prices.present?
+    return { fetched: true, notice: "Prices were present already" } if stock&.stock_prices.present?
 
     current_from = [ START_DATE, stock.listing_date.to_date ].max
     current_to = current_from + BATCH_DURATION
@@ -54,7 +54,6 @@ class NseHistoricalDataJob < ApplicationJob
 
   def extract_prices(data_rows, stock_id)
     data_rows.map do |values|
-
       begin
         {
           stock_id: stock_id,

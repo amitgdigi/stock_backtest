@@ -38,11 +38,12 @@ class BacktestsController < ApplicationController
   def show
     last_price = backtest.stock.stock_prices.find_by(date: params[:end_date])&.close_price || backtest.stock.stock_prices.last.close_price
 
-    portfolio = (backtest.transactions.sum { |t| t.transaction_type == "buy" ? t.quantity : -t.quantity }) * last_price
-    profit_loss = backtest.transactions.sold.present? ? ((backtest.transactions - backtest.transactions.unsold_stocks).sum { |t| t.transaction_type == "sell" ? t.amount : -t.amount }) : 0
-    final_shares = backtest.transactions.sum { |t| t.transaction_type == "buy" ? t.quantity : -t.quantity }
+    portfolio = (backtest.transactions.sum { |t| t.buy? ? t.quantity : -t.quantity }) * last_price
+    profit_loss = backtest.transactions.sold(backtest_id: backtest.id).present? ? ((backtest.transactions - backtest.transactions.unsold_stocks).sum { |t| t.sell? ? t.amount : -t.amount }) : 0
+    final_shares = backtest.transactions.sum { |t| t.buy? ? t.quantity : -t.quantity }
     invested_amount = backtest.transactions.unsold_stocks.sum(&:amount)
-    charges = (backtest.transactions.sum(&:amount) * 0.003321) + backtest.transactions.sold.count * 16
+    sold_count = backtest.transactions.sold(backtest_id: backtest.id).filter { |t| t.quantity > 0 }.count
+    charges = (backtest.transactions.sum(:amount) * 0.003321) + (sold_count * 16)
 
     @backtest=backtest
     @result = {
