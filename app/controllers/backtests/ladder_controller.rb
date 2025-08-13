@@ -37,18 +37,19 @@ class Backtests::LadderController < ApplicationController
 
   def show
     stock_prices = backtest.stock.stock_prices
-    transactions = backtest.transactions
+    transactions = backtest.transactions.order(:date)
     last_price = transactions.last&.[](:price) || stock_prices.last.close_price
 
-    active_buys = transactions.where(transaction_type: :buy, open: true)
+    active_buys = transactions.where(kind: :buy, open: true)
 
 
     portfolio = active_buys.sum(:quantity) * last_price
 
-    profit_loss = transactions.sold.present? ? ((transactions - active_buys).sum { |t| t.transaction_type == "sell" ? t.amount : -t.amount }) : 0
+    profit_loss = transactions.sold(backtest_id: backtest.id).present? ? ((transactions - active_buys).sum { |t| t.sell? ? t.amount : -t.amount }) : 0
     final_shares = active_buys.sum(&:quantity)
     invested_amount = active_buys.sum(:amount)
-    charges = (transactions.sum(:amount) * 0.0023) + transactions.sold.size * 16
+    sold_count = transactions.sold(backtest_id: backtest.id).filter { |t| t.quantity > 0 }.count
+    charges = (transactions.sum(:amount) * 0.003321) + (sold_count * 16)
 
     @backtest = backtest
     @result = {

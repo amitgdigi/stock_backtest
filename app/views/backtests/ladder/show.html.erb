@@ -38,6 +38,7 @@
       <table class="min-w-full divide-y border border-gray-200 divide-gray-200 bg-white rounded-md">
         <thead class="bg-gray-200">
           <tr>
+            <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600"> </th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Date</th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Type</th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Price</th>
@@ -46,15 +47,16 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-          <% @result[:transactions].each do |txn| %>
+          <% @result[:transactions].each_with_index do |txn, i| %>
             <tr class="hover:bg-gray-100 transition">
+              <td class="px-4 py-2"><%= i+1 %></td>
               <td class="px-4 py-2"><%= txn.date %></td>
-              <td class="px-4 py-2 capitalize"><%= txn.transaction_type %></td>
+              <td class="px-4 py-2 capitalize"><%= txn.kind %></td>
               <td class="px-4 py-2"><%= txn.price %></td>
               <td class="px-8 py-2"><%= txn.quantity %></td>
               <td class="px-4 py-2">
                 <% amt = number_with_precision(txn.amount, precision: 2) %>
-                <% if txn.transaction_type == "sell" %>
+                <% if txn.sell? %>
                   <span class="text-red-600 font-medium"><%= amt %></span>
                 <% else %>
                   <span class="text-green-700"><%= amt %></span>

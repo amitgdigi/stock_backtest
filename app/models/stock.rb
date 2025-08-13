@@ -16,9 +16,19 @@
 class Stock < ApplicationRecord
   has_many :stock_prices, dependent: :destroy
   has_many :backtests, dependent: :destroy
+  has_and_belongs_to_many :multi_stocks
   validates :ticker, presence: true, uniqueness: true
 
   def display_name
     name.present? ? "#{ticker} - #{name}" : ticker
+  end
+
+  def serialize
+    {
+      id:,
+      ticker:,
+      name:,
+      listing_date:
+    }
   end
 end

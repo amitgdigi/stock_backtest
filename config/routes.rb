@@ -8,6 +8,12 @@ Rails.application.routes.draw do
   namespace :backtests do
     resources :ladder, only: [ :new, :create, :show, :update ]
   end
+  resources :multi_stock, only: [ :index, :create, :show ] do
+    collection do
+      get :search_stock
+      post :backtest
+    end
+  end
 
   get "stocks/search", to: "stocks#search"
   get "stocks/ipo", to: "stocks#ipo"

@@ -40,6 +40,12 @@ class LadderStrategyService
 
     @strategy.update(status: "completed")
 
+    @transactions.pluck(:id).each_cons(2) do |first_id, second_id|
+      if first_id > second_id
+        @strategy.destroy
+        raise StandardError, "Something went wrong, please try again"
+      end
+    end
     { active_ladders: @active_ladders }
   rescue StandardError => e
     { error: "Backtest failed: #{e.message}" }
@@ -74,11 +80,11 @@ class LadderStrategyService
   end
 
   def close_transaction(id)
-    Transaction.where(id: id).update_all(open: false) # Faster than find + update
+    Transaction.where(id:).update_all(open: false) # Faster than find + update
   end
 
   def quantity_on_amount(price)
-    (@investment_amount / price).to_i
+    [ (@investment_amount/price).to_i, 1 ].max
   end
 
   def handle_stock_split
@@ -87,13 +93,13 @@ class LadderStrategyService
   end
 
   def build_transaction(type, date, price, quantity)
-    Transaction.new(
-      backtest_id: @strategy.id,
-      transaction_type: type,
-      date: date,
-      price: price,
-      quantity: quantity,
-      amount: (quantity * price).round(2)
+    @last_traded_price = price
+    Transaction.new(backtest_id: @strategy.id,
+      kind: type,
+      date:,
+      price:,
+      quantity:,
+      amount: (quantity * price)
     )
   end
 

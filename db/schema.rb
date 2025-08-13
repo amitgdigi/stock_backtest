@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_06_063446) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_13_101309) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_063446) do
     t.datetime "updated_at", null: false
     t.decimal "maximum_buy_amount", precision: 10, scale: 2
     t.index ["stock_id"], name: "index_backtests_on_stock_id"
+  end
+
+  create_table "multi_stocks", force: :cascade do |t|
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.decimal "investment_amount", precision: 15, scale: 2, null: false
+    t.decimal "maximum_buy_amount", precision: 10, scale: 2
+    t.decimal "sell_profit_percentage", precision: 5, scale: 2, null: false
+    t.decimal "buy_dip_percentage", precision: 5, scale: 2, null: false
+    t.decimal "reinvestment_percentage", precision: 5, scale: 2
+    t.decimal "total_amount", precision: 15, scale: 2
+    t.string "status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "multi_stocks_stocks", id: false, force: :cascade do |t|
+    t.bigint "multi_stock_id", null: false
+    t.bigint "stock_id", null: false
+    t.index ["multi_stock_id", "stock_id"], name: "index_multi_stocks_stocks_on_multi_stock_id_and_stock_id", unique: true
+    t.index ["stock_id", "multi_stock_id"], name: "index_multi_stocks_stocks_on_stock_id_and_multi_stock_id"
   end
 
   create_table "stock_prices", force: :cascade do |t|
@@ -53,8 +74,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_063446) do
   end
 
   create_table "transactions", force: :cascade do |t|
-    t.bigint "backtest_id", null: false
-    t.string "transaction_type", null: false
+    t.bigint "backtest_id"
+    t.integer "kind", default: 0, null: false
     t.date "date", null: false
     t.decimal "price", precision: 10, scale: 2, null: false
     t.integer "quantity", null: false
@@ -62,10 +83,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_063446) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "open", default: true
+    t.bigint "multi_stock_id"
+    t.bigint "stock_id"
     t.index ["backtest_id"], name: "index_transactions_on_backtest_id"
+    t.index ["multi_stock_id"], name: "index_transactions_on_multi_stock_id"
+    t.index ["stock_id"], name: "index_transactions_on_stock_id"
   end
 
   add_foreign_key "backtests", "stocks"
   add_foreign_key "stock_prices", "stocks"
   add_foreign_key "transactions", "backtests"
+  add_foreign_key "transactions", "multi_stocks"
+  add_foreign_key "transactions", "stocks"
 end

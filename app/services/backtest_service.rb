@@ -26,7 +26,7 @@ class BacktestService
     @portfolio[:cash] -= initial_quantity * first_price
     @last_purchase_price = first_price
     buy_first = false
-    save_transaction("buy", @backtest.start_date, first_price, initial_quantity)
+    save_transaction("buy", prices.first[:date], first_price, initial_quantity)
 
     # Iterate through each day (skip first day)
     prices[1..-1].each do |price|
@@ -86,7 +86,7 @@ class BacktestService
 
     @transactions << Transaction.create!(
       backtest_id: @backtest.id,
-      transaction_type: type,
+      kind: type,
       date: date,
       price: price,
       quantity: quantity.round(4),
