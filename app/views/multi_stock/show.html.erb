@@ -1,6 +1,6 @@
 <div class="container max-w-4xl mx-auto mt-10 px-4">
   <div class="flex justify-between gap-2 mb-4">
-    <h1 class="flex items-center text-2xl font-semibold text-gray-800">Backtest Results for <span class="px-1 text-blue-600"><%= @result[:stock_names] %></span></h1>
+    <h1 class="flex items-center text-2xl font-semibold gap-2 text-gray-800">Backtest Results for <span class="text-blue-600"><%= @result[:stock_names] %></span></h1>
     <div class="flex flex-wrap gap-2 items-center justify-start">
       <%= link_to 'Home', root_path, class: 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition' %>
     </div>
@@ -25,22 +25,22 @@
         </h2>
         <div class="flex justify-between text-sm mb-3">
           <div class="w-1/2 pr-2 text-center">
-            <p class="text-gray-500 text-xs uppercase tracking-wide">Portfolio</p>
-            <p class="text-lg font-semibold text-green-700">
-              <%= number_with_precision(item[:portfolio], precision: 2).presence  || "N/A" %>
+            <p class="text-gray-500 text-xs uppercase tracking-wide">P&L</p>
+              <% growth = item[:pnl]%>
+            <p class="<%= growth >= 0 ? 'text-green-700' : 'text-red-700' %>  text-lg font-semibold">
+              <%= number_with_precision(item[:pnl], precision: 2).presence  || "N/A" %>
             </p>
           </div>
           <div class="w-1/2 pr-2 text-center">
-            <p class="text-gray-500 text-xs uppercase tracking-wide">P&L</p>
-              <% growth = item[:pnl]%>
-            <p class="<%= growth >= 0 ? 'text-green-700' : 'text-red-700' %>  text-lg font-semibold text-green-700">
-              <%= number_with_precision(item[:pnl], precision: 2).presence  || "N/A" %>
+            <p class="text-gray-500 text-xs uppercase tracking-wide">Charges</p>
+            <p class="text-lg font-semibold text-red-600">
+              <%= number_with_precision(item[:charges], precision: 2).presence  || "N/A" %>
             </p>
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-1 text-sm">
           <div class="p-3 bg-gray-50 rounded-lg text-center">
-            <p class="text-gray-500 text-xs uppercase tracking-wide">Invested Amount</p>
+            <p class="text-gray-500 text-xs uppercase tracking-wide">Invested</p>
             <p class="text-lg font-semibold text-purple-700">
               <%= number_with_precision(item[:invested_amount], precision: 2).presence  || "N/A" %>
             </p>
@@ -52,9 +52,9 @@
             </p>
           </div>
           <div class="p-3 bg-gray-50 rounded-lg text-center">
-            <p class="text-gray-500 text-xs uppercase tracking-wide">Charges</p>
-            <p class="text-lg font-semibold text-red-600">
-              <%= number_with_precision(item[:charges], precision: 2).presence  || "N/A" %>
+            <p class="text-gray-500 text-xs uppercase tracking-wide">Portfolio</p>
+            <p class="text-lg font-semibold text-green-700">
+              <%= number_with_precision(item[:portfolio], precision: 2).presence  || "N/A" %>
             </p>
           </div>
         </div>

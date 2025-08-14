@@ -28,7 +28,7 @@ class MultiStockController < ApplicationController
   def show
     portfolio_data = calculate_portfolio
 
-    stock_names = portfolio_data.map { |entry| entry[:stock][:ticker] }.join(",")
+    stock_names = portfolio_data.map { |entry| entry[:stock][:ticker] }.join(", ")
     portfolio = portfolio_data.sum { |entry| entry[:portfolio] }
     profit_loss = portfolio_data.sum { |entry| entry[:pnl] }
     final_shares  = portfolio_data.sum { |entry| entry[:final_shares] }

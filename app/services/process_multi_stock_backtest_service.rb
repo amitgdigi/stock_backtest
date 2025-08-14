@@ -6,9 +6,9 @@ class ProcessMultiStockBacktestService
 
   def run
     fetch_stock_symbols
-    return { wait: true, notice: "we are fetching records, please try again", missing: @missing_symbols } if missing_data?
+    return { wait: true, notice: "We are fetching records, Please try again", missing: @missing_symbols } if @missing_symbols.present?
 
-    return false unless confirmed_stock_prices?
+    return { wait: true, notice: "Something wrong at records fetching, Please Check", missing: @missing_symbols } unless confirmed_stock_prices?
 
     perform_backtest
     apply_transaction_logic
@@ -21,23 +21,18 @@ class ProcessMultiStockBacktestService
 
   def fetch_stock_symbols
     @symbols = @params[:stock_symbols]&.map(&:upcase)
-    @missing_symbols = @symbols - Stock.where(ticker: @symbols).pluck(:ticker)
-  end
-
-  def missing_data?
-    if @missing_symbols.any?
-      fetch_stock_prices
-      true
-    else
-      false
+    stocks = Stock.where(ticker: @symbols)
+    stocks.each do |stock|
+      fetch_stock_prices(stock.ticker) if stock.stock_prices.empty?
     end
-  end
-
-
-  def fetch_stock_prices
+    @missing_symbols = (@symbols - stocks.pluck(:ticker))
     @missing_symbols.each do |symbol|
-      NseHistoricalDataJob.perform_later(symbol)
+      fetch_stock_prices(symbol)
     end
+  end
+
+  def fetch_stock_prices(symbol)
+    NseHistoricalDataJob.perform_later(symbol)
   end
 
   def confirmed_stock_prices?

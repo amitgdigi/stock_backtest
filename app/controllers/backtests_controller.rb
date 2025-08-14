@@ -49,7 +49,7 @@ class BacktestsController < ApplicationController
     @result = {
       portfolio:,
       profit_loss:,
-      transactions: backtest.transactions,
+      transactions: backtest.transactions.order(:date),
       final_shares:,
       invested_amount:,
       charges:
