@@ -13,7 +13,7 @@ class BacktestService
     # Fetch or use cached prices
     prices = @stock.stock_prices.where(date: @backtest.start_date..@backtest.end_date)
                       .order(:date)
-                      .map { |p| { date: p.date, close_price: p.close_price } }
+                      .map { |p| { date: p.date, close_price: p.close_price, open_price: p.open_price } }
 
     [ @backtest.destroy, @stock.destroy, @transactions.destroy ] if prices.empty?
 
@@ -32,7 +32,7 @@ class BacktestService
     prices[1..-1].each do |price|
       current_price = price[:close_price]
       # Assuming if stocks split happens, previous price would definitely be twice of the next day price
-      handle_stock_split if @last_purchase_price > (current_price*1.9)
+      handle_stock_split(price[:open_price]) if @last_purchase_price > (current_price*1.9)
       price_change_percent = ((current_price - @last_purchase_price) / @last_purchase_price) * 100
 
       # Sell
@@ -72,12 +72,14 @@ class BacktestService
 
   private
 
-  def handle_stock_split
-    @portfolio[:shares] = @portfolio[:shares] * 2
-    @portfolio[:cash] = @portfolio[:cash] / 2
-    @last_purchase_price = @last_purchase_price / 2
+  def handle_stock_split(open_price)
+    split_ratio = (@last_purchase_price/open_price).round
+
+    @portfolio[:shares] = @portfolio[:shares] * split_ratio
+    @portfolio[:cash] = @portfolio[:cash] / split_ratio
+    @last_purchase_price = @last_purchase_price / split_ratio
     @transactions.each do |t|
-      t.update(price: t.price/2, quantity: t.quantity*2)
+      t.update(price: t.price/split_ratio, quantity: t.quantity*split_ratio)
     end
   end
 
