@@ -3,7 +3,7 @@ class BacktestsController < ApplicationController
   CHARGE = ENV.fetch("SELLING_CHARGES_RUPEES", 16)
 
   def new
-    @recent_tested_stocks = recent_stocks
+    @recent_tested_stocks = stock_list
     @backtest = Backtest.new(default_backtest_attributes)
   end
 
@@ -99,7 +99,7 @@ class BacktestsController < ApplicationController
     end
 
     def recent_stocks
-      Backtest.order(id: :desc)
+      @_recent_stocks ||= Backtest.order(id: :desc)
               .limit(30)
               .includes(:stock)
               .map(&:stock)
@@ -107,10 +107,20 @@ class BacktestsController < ApplicationController
               .first(10)
     end
 
+    def stock_list
+      stocks = recent_stocks.dup
+
+      if Stock.last && (stocks.empty? || Stock.last.created_at > stocks.first.created_at)
+        stocks.unshift(Stock.last)
+      end
+      stocks
+    end
+
     def default_backtest_attributes
       last = Backtest.last
+
       {
-        stock_id: recent_stocks.first&.id,
+        stock_id: stock_list.first&.id,
         start_date: last&.start_date || Date.current.beginning_of_year - 1.year,
         end_date: last&.end_date || Date.today,
         investment_amount: last&.investment_amount&.to_i || 5000,

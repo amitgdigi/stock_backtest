@@ -9,16 +9,16 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-200 text-sm text-gray-700 bg-white rounded-md shadow-md p-6 mb-6">
     <div><strong>Start Date:</strong> <%= @backtest.start_date %></div>
     <div><strong>End Date:</strong> <%= @backtest.end_date || (@backtest.start_date + 30) %></div>
-    <div><strong>Invested Amount:</strong> ₹<%= precision(@result[:invested_amount]) %></div>
-    <div><strong>Portfolio Value:</strong> ₹<%= precision(@result[:portfolio]) %></div>
+    <div><strong>Invested Amount:</strong> ₹<%= precision_inr(@result[:invested_amount]) %></div>
+    <div><strong>Portfolio Value:</strong> ₹<%= precision_inr(@result[:portfolio]) %></div>
     <div>
       <strong>Realized P&L:</strong>
       <span class="<%= @result[:profit_loss] >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>">
-        ₹<%= precision(@result[:profit_loss]) %>
+        ₹<%= precision_inr(@result[:profit_loss]) %>
       </span>
     </div>
     <div><strong>Final Shares:</strong> <%= @result[:final_shares] %></div>
-    <div><strong>Total Charges:</strong> ₹<%= precision(@result[:charges]) %></div>
+    <div><strong>Total Charges:</strong> ₹<%= precision_inr(@result[:charges]) %></div>
   </div>
 
   <h3 class="text-l font-semibold flex justify-center text-gray-800">Averaging Down with Fixed Profit</h2>
@@ -45,10 +45,10 @@
               <td class="px-4 pl-2"><%= i+1 %></td>
               <td class="px-4 py-2"><%= txn.date %></td>
               <td class="px-4 py-2 capitalize"><%= txn.kind %></td>
-              <td class="px-4 py-2"><%= precision(txn.price )%></td>
+              <td class="px-4 py-2"><%= precision_inr(txn.price )%></td>
               <td class="px-8 py-2"><%= txn.quantity %></td>
               <td class="px-4 py-2">
-                <% amt = precision(txn.amount) %>
+                <% amt = precision_inr(txn.amount) %>
                 <% if txn.sell? %>
                   <span class="text-red-600 font-medium"><%= amt %></span>
                 <% else %>
