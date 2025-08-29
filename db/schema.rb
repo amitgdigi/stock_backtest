@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_13_101309) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_18_132254) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -85,6 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_101309) do
     t.boolean "open", default: true
     t.bigint "multi_stock_id"
     t.bigint "stock_id"
+    t.decimal "total_amount", precision: 15, scale: 2
     t.index ["backtest_id"], name: "index_transactions_on_backtest_id"
     t.index ["multi_stock_id"], name: "index_transactions_on_multi_stock_id"
     t.index ["stock_id"], name: "index_transactions_on_stock_id"

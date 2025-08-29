@@ -9,6 +9,7 @@
 #  open           :boolean          default(TRUE)
 #  price          :decimal(10, 2)   not null
 #  quantity       :integer          not null
+#  total_amount   :decimal(15, 2)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  backtest_id    :bigint
@@ -46,14 +47,16 @@ class Transaction < ApplicationRecord
     query
   }
 
-  scope :unsold_stocks, -> {
-    last_sell_record = where(kind: "sell").order(created_at: :desc).first
-    if last_sell_record.present?
-      where("created_at > ?", last_sell_record.created_at)
+  scope :unsold_stocks, ->(stock_id: nil) {
+    base = stock_id.present? ? where(stock_id:) : all
+    last_sell_at = base.sell.maximum(:created_at)
+
+    if last_sell_at.present?
+      base.where("created_at > ?", last_sell_at)
     else
-      all
+      base
     end
-   }
+  }
 
   def collect_unsold_between(include_self: false)
     last_sell = self.class
@@ -85,7 +88,8 @@ class Transaction < ApplicationRecord
       multi_stock_id:,
       stock_id:,
       stock_name: stock&.name,
-      symbol: stock&.ticker
+      symbol: stock&.ticker,
+      remains: total_amount
     }
   end
 end

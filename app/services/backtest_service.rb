@@ -53,6 +53,7 @@ class BacktestService
         @portfolio[:cash] -= quantity * current_price
         buy_first = false
         save_transaction("buy", price[:date], current_price, quantity)
+        # Swipe the transactions from the last sell, collect the amount/shares for last purchase price
         @last_purchase_price = (@portfolio[:shares] > 0) ? (@backtest.transactions.unsold_stocks.sum(&:amount) / @portfolio[:shares]) : current_price
       end
       @last_purchase_price = [ @last_purchase_price, current_price ].max if buy_first

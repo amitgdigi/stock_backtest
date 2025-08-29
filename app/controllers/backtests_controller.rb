@@ -1,4 +1,7 @@
 class BacktestsController < ApplicationController
+  T_CHARGE = ENV.fetch("TRANSACTION_CHARGES_PERCENTAGE", 0.00223)
+  CHARGE = ENV.fetch("SELLING_CHARGES_RUPEES", 16)
+
   def new
     @recent_tested_stocks = recent_stocks
     @backtest = Backtest.new(default_backtest_attributes)
@@ -43,7 +46,7 @@ class BacktestsController < ApplicationController
     final_shares = backtest.transactions.sum { |t| t.buy? ? t.quantity : -t.quantity }
     invested_amount = backtest.transactions.unsold_stocks.sum(&:amount)
     sold_count = backtest.transactions.sold(backtest_id: backtest.id).filter { |t| t.quantity > 0 }.count
-    charges = (backtest.transactions.sum(:amount) * 0.003321) + (sold_count * 16)
+    charges = (backtest.transactions.sum(:amount) * T_CHARGE.to_f) + (sold_count * CHARGE.to_f)
 
     @backtest=backtest
     @result = {

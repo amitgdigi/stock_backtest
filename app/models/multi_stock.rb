@@ -18,7 +18,7 @@
 class MultiStock < ApplicationRecord
   # belongs_to :stock
   has_many :transactions, dependent: :destroy
-  has_and_belongs_to_many :multi_stocks
+  has_and_belongs_to_many :stocks
   after_create_commit :set_default_values
 
   validates :start_date, :investment_amount, :sell_profit_percentage, :buy_dip_percentage, presence: true

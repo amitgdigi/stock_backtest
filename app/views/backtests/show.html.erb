@@ -9,16 +9,16 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-200 text-sm text-gray-700 bg-white rounded-md shadow-md p-6 mb-6">
     <div><strong>Start Date:</strong> <%= @backtest.start_date %></div>
     <div><strong>End Date:</strong> <%= @backtest.end_date || (@backtest.start_date + 30) %></div>
-    <div><strong>Invested Amount:</strong> ₹<%= number_with_precision(@result[:invested_amount], precision: 2) %></div>
-    <div><strong>Final Portfolio Value:</strong> ₹<%= number_with_precision(@result[:portfolio], precision: 2) %></div>
+    <div><strong>Invested Amount:</strong> ₹<%= precision(@result[:invested_amount]) %></div>
+    <div><strong>Portfolio Value:</strong> ₹<%= precision(@result[:portfolio]) %></div>
     <div>
-      <strong>Profit/Loss:</strong>
+      <strong>Realized P&L:</strong>
       <span class="<%= @result[:profit_loss] >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>">
-        ₹<%= number_with_precision(@result[:profit_loss], precision: 2) %>
+        ₹<%= precision(@result[:profit_loss]) %>
       </span>
     </div>
     <div><strong>Final Shares:</strong> <%= @result[:final_shares] %></div>
-    <div><strong>Total Charges:</strong> ₹<%= number_with_precision(@result[:charges], precision: 2) %></div>
+    <div><strong>Total Charges:</strong> ₹<%= precision(@result[:charges]) %></div>
   </div>
 
   <h3 class="text-l font-semibold flex justify-center text-gray-800">Averaging Down with Fixed Profit</h2>
@@ -31,7 +31,7 @@
       <table class="min-w-full divide-y border border-gray-200 divide-gray-200 bg-white rounded-md">
         <thead class="bg-gray-200">
           <tr>
-            <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600"> </th>
+            <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600"></th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Date</th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Type</th>
             <th class="text-left px-4 py-2 text-sm font-semibold text-gray-600">Price</th>
@@ -42,13 +42,13 @@
         <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
           <% @result[:transactions].each_with_index do |txn, i| %>
             <tr class="hover:bg-gray-100 transition">
-              <td class="px-4 py-2"><%= i+1 %></td>
+              <td class="px-4 pl-2"><%= i+1 %></td>
               <td class="px-4 py-2"><%= txn.date %></td>
               <td class="px-4 py-2 capitalize"><%= txn.kind %></td>
-              <td class="px-4 py-2"><%= txn.price %></td>
+              <td class="px-4 py-2"><%= precision(txn.price )%></td>
               <td class="px-8 py-2"><%= txn.quantity %></td>
               <td class="px-4 py-2">
-                <% amt = number_with_precision(txn.amount, precision: 2) %>
+                <% amt = precision(txn.amount) %>
                 <% if txn.sell? %>
                   <span class="text-red-600 font-medium"><%= amt %></span>
                 <% else %>

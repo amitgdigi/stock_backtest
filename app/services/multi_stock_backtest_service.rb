@@ -5,6 +5,9 @@ class MultiStockBacktestService
     @transactions = []
     @last_traded_price = nil
     @reinvestment = @multi_stock.reinvestment_percentage
+    @investment_amount = @multi_stock.investment_amount
+    @max_buy_amount = @multi_stock.maximum_buy_amount
+    @portfolio = { shares: 0, cash: 0.0 }
   end
 
   def run
@@ -17,8 +20,13 @@ class MultiStockBacktestService
 
     # Initial buy
     @last_traded_price = prices.first[1]
+    current_date = prices.first[0]
+    initial_quantity = [ (@investment_amount / @last_traded_price).to_i, 1 ].max
+    @portfolio[:shares] += initial_quantity
+    @portfolio[:cash] -= initial_quantity * @last_traded_price
+
     buy_first = false
-    @transactions << save_transaction("buy", @multi_stock.start_date, @last_traded_price)
+    @transactions << save_transaction("buy", current_date, @last_traded_price, initial_quantity)
 
     # Iterate through each day (skip first day)
     prices.drop(1).each do |current_date, current_price, open_price|
@@ -28,16 +36,25 @@ class MultiStockBacktestService
 
       # Sell
       if !buy_first && price_change_percent >= @multi_stock.sell_profit_percentage
-        @transactions << save_transaction("sell", current_date, current_price)
+        @transactions << save_transaction("sell", current_date, current_price, @portfolio[:shares])
+        @portfolio[:shares] = 0
+        @portfolio[:cash] = 0
+
         @last_traded_price = current_price
         buy_first = true
 
       # Buy
       elsif price_change_percent <= -@multi_stock.buy_dip_percentage
-        buy_first = false
-        @transactions << save_transaction("buy", current_date, current_price)
+        reinvest_amount = @portfolio[:shares] > 0 ? @portfolio[:cash].abs * (@multi_stock.reinvestment_percentage / 100) : @investment_amount
+        reinvest_amount = [ reinvest_amount, @max_buy_amount ].min if @max_buy_amount > 0
+
+        quantity = [ (reinvest_amount / current_price).to_i, 1 ].max
+        @portfolio[:shares] += quantity
+        @portfolio[:cash] -= quantity * current_price
+        @transactions << save_transaction("buy", current_date, current_price, quantity)
         # unsold = @multi_stock.transactions.unsold_stocks
-        @last_traded_price = buy_first ? current_price : (@last_traded_price + current_price)*@reinvestment/100
+        @last_traded_price = buy_first ? current_price : (@multi_stock.transactions.unsold_stocks(stock_id: @stock.id).sum(&:amount) / @portfolio[:shares])
+        buy_first = false
         # @last_traded_price = unsold.size > 0 ? unsold.sum(&:price)/unsold.size : current_price
       end
       @last_traded_price = [ @last_traded_price, current_price ].max if buy_first
@@ -55,20 +72,26 @@ class MultiStockBacktestService
 
   def handle_stock_split(open_price)
     split_ratio = (@last_traded_price/open_price).round
-    @last_traded_price /=split_ratio
+
+    @portfolio[:shares] = @portfolio[:shares] * split_ratio
+    @portfolio[:cash] = @portfolio[:cash] / split_ratio
+    @last_traded_price = @last_traded_price / split_ratio
     @transactions.each do |t|
-      t.update(price: t.price/split_ratio)
+      t.update(price: t.price/split_ratio, quantity: t.quantity*split_ratio)
     end
   end
 
-  def save_transaction(type, date, price)
+
+  def save_transaction(type, date, price, quantity)
+    amount = (quantity * price).round(2)
+
      Transaction.create!(
       multi_stock_id: @multi_stock.id,
       kind: type,
       date:,
       price:,
-      quantity: 0,
-      amount: 0,
+      quantity:,
+      amount:,
       stock_id: @stock.id
     )
   end
