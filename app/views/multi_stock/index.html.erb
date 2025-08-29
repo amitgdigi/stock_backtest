@@ -38,7 +38,7 @@
         <%= f.label :maximum_buy_amount, 'Maximum Buy Amount (₹)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
         <%= render "tooltip", tooltip_id: "max-buy-tip", message: "Set the maximum buy amount at the time of averaging." %>
       </div>
-      <%= f.number_field :maximum_buy_amount, value: 10000, step: 5000, min: 0,
+      <%= f.number_field :maximum_buy_amount, step: 1000, min: 0,
             class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
     </div>
 
@@ -70,9 +70,9 @@
     <div>
       <div class="flex items-center mb-1">
         <%= f.label :total_amount, 'Total Amount (%)', class: 'block text-sm font-medium text-gray-700 mb-1' %>
-        <%= render "tooltip", tooltip_id: "total_amount-tip", message: "All the transaction of stocks will be done within the total amount, Once this amount finishes, No transaction will take place, It is suggested to start with 2-3 Lakhs." %>
+        <%= render "tooltip", tooltip_id: "total_amount-tip", message: "All the transaction of stocks will be done within the total amount, Once this amount finishes, No transaction will take place, It is suggested to start with 2-3 Lakhs. | #{ENV["SPLIT_TRADE_DAY"].to_f.round} trade will be reserved from total amount" %>
       </div>
-      <%= f.number_field :total_amount, step: 10000, min: 0, required: true,
+      <%= f.number_field :total_amount, step: 5000, min: 0, required: true,
             class: 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500' %>
     </div>
 

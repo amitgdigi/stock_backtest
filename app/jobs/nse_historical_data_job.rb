@@ -29,9 +29,8 @@ class NseHistoricalDataJob < ApplicationJob
         to: current_to.strftime("%d-%m-%Y"),
         symbol:,
         type: "priceVolumeDeliverable",
-        series: "EQ"
+        series: "EQ" # EQ, BE
       }, headers: HEADERS)
-
 
       data = JSON.parse(response.body, symbolize_names: true)
       break unless data[:data].present?

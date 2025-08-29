@@ -1,4 +1,7 @@
 class Backtests::LadderController < ApplicationController
+  T_CHARGE = ENV.fetch("TRANSACTION_CHARGES_PERCENTAGE", 0.00223)
+  CHARGE = ENV.fetch("SELLING_CHARGES_RUPEES", 16)
+
   def new
     @recent_tested_stocks = recent_stocks
     @backtest = Backtest.new(default_backtest_attributes)
@@ -49,7 +52,7 @@ class Backtests::LadderController < ApplicationController
     final_shares = active_buys.sum(&:quantity)
     invested_amount = active_buys.sum(:amount)
     sold_count = transactions.sold(backtest_id: backtest.id).filter { |t| t.quantity > 0 }.count
-    charges = (transactions.sum(:amount) * 0.003321) + (sold_count * 16)
+    charges = (transactions.sum(:amount) * T_CHARGE.to_f) + (sold_count * CHARGE.to_f)
 
     @backtest = backtest
     @result = {
