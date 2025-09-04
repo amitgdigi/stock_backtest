@@ -11,9 +11,6 @@
 ARG RUBY_VERSION=3.2.2
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
-ARG SECRET_KEY_BASE=dummy
-ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
-
 # Rails app lives here
 WORKDIR /rails
 
