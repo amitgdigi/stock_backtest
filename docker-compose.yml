@@ -1,9 +1,8 @@
-
 services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     env_file:
       - .env.docker
     ports:
@@ -12,8 +11,19 @@ services:
       - .:/app
     depends_on:
       - db
-    stdin_open: true
-    tty: true
+    command: bundle exec rails server -b 0.0.0.0 -p 3000
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+    command: bundle exec solid_queue:start
+    volumes:
+      - .:/app
 
   db:
     image: postgres:15
@@ -21,10 +31,8 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: docker_stock_backtest
+    env_file:
+      - .env.docker
 
 volumes:
   pgdata:
