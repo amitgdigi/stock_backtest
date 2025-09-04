@@ -11,6 +11,9 @@
 ARG RUBY_VERSION=3.2.2
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
+ARG SECRET_KEY_BASE=dummy
+ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
+
 # Rails app lives here
 WORKDIR /rails
 
@@ -46,7 +49,7 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN bundle exec rails assets:precompile
+RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
 
 
 
