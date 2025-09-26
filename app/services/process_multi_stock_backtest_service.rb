@@ -76,7 +76,7 @@ class ProcessMultiStockBacktestService
     if t.collect_unsold_between.present?
       re_buy_value = t.collect_unsold_between.sum(&:amount) * @params[:reinvestment_percentage].to_f / 100
       re_buy_value = [ re_buy_value, @max_buy_amount ].min if @max_buy_amount > 0
-      quantity = (re_buy_value / t.price).to_i
+      quantity = [ 1, (re_buy_value / t.price).to_i ].max
       amount = quantity * t.price
       if @total_amount >= amount && quantity > 0
         charges = (amount * T_CHARGE.to_f)
@@ -88,7 +88,7 @@ class ProcessMultiStockBacktestService
     else
       buy_value = @total_amount/SPLIT_TRADE_DAY.to_f
       buy_value = [ buy_value, @initial_buy_amount ].max if @initial_buy_amount > 0
-      quantity = (buy_value / t.price).to_i
+      quantity = [ 0, (buy_value / t.price).to_i ].max
       amount = quantity * t.price
       if @total_amount >= amount && quantity > 0
         charges = (amount * T_CHARGE.to_f)

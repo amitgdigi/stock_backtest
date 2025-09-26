@@ -1,14 +1,18 @@
 <div class="container max-w-4xl mx-auto mt-10 px-4">
   <div class="flex justify-between gap-2 mb-4">
-    <h1 class="flex items-center text-2xl font-semibold text-gray-800">Backtest Results for <span class="px-1 text-blue-600"><%= @backtest.stock.ticker %></span></h1>
-    <div class="flex flex-wrap gap-2 items-center justify-start">
-      <%= link_to 'Home', root_path, class: 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition' %>
+    <h1 class="flex items-center text-2xl font-semibold gap-2 text-gray-800">Backtest Results for <span class="text-blue-600"><%= @backtest.stock.ticker %></span></h1>
+    <div class="flex flex-wrap items-center justify-center">
+      <%= link_to "Home", root_path, class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition" %>
+      <%= link_to "←", new_backtests_ladder_path, title: "Back", class: "text-blue-700 text-3xl" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-200 text-sm text-gray-700 bg-white rounded-md shadow-md p-6 mb-6">
     <div><strong>Start Date:</strong> <%= @backtest.start_date %></div>
     <div><strong>End Date:</strong> <%= @backtest.end_date || (@backtest.start_date + 30) %></div>
+    <div><strong>Buy at:</strong> <%= precision_inr(@backtest.buy_dip_percentage, precision: 0) %>%</div>
+    <div><strong>Sell at:</strong> <%= precision_inr(@backtest.sell_profit_percentage, precision: 0) %>%</div>
+    <div><strong>Initial amount:</strong> <%= precision_inr(@backtest.investment_amount, precision: 0) %></div>
     <div><strong>Invested Amount:</strong> ₹<%= precision_inr(@result[:invested_amount]) %></div>
     <div><strong>Final Portfolio Value:</strong> ₹<%= precision_inr(@result[:portfolio]) %>
       <% if @result[:active_buys].present?%>
@@ -22,9 +26,17 @@
       </span>
     </div>
     <div><strong>Final Shares:</strong> <%= @result[:final_shares] %></div>
-    <div><strong>Total Charges:</strong> ₹<%= precision_inr(@result[:charges]) %></div>
-    <% if @result[:unrealized_pl] != 0 %>
-      <div><strong>Unrealized Profit/Loss:</strong> ₹<%= precision_inr(@result[:unrealized_pl]) %></div>
+    <div><strong>Total Charges:</strong>
+      <span class="<%= @result[:profit_loss] <= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>">
+        ₹<%= precision_inr(@result[:charges]) %>
+      </span>
+    </div>
+    <% if @result[:unrealized_pl] !=0 %>
+      <div><strong>Unrealized Profit/Loss:</strong>
+        <span class="<%= @result[:profit_loss] <= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' %>">
+          ₹<%= precision_inr(@result[:unrealized_pl]) %>
+        </span>
+      </div>
     <% end %>
   </div>
 
