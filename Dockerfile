@@ -65,4 +65,4 @@ USER rails
 
 EXPOSE 80
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+CMD ["bash", "-c", "bundle exec rails db:prepare && bundle exec puma -C config/puma.rb"]
