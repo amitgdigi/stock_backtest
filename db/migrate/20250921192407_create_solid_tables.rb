@@ -1,6 +1,6 @@
 class CreateSolidTables < ActiveRecord::Migration[8.0]
   def change
-    create_table :solid_queue_blocked_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_blocked_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.string :queue_name, null: false
       t.integer :priority, default: 0, null: false
@@ -12,7 +12,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:job_id], name: "index_solid_queue_blocked_executions_on_job_id", unique: true, force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_claimed_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_claimed_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.bigint :process_id
       t.datetime :created_at, null: false
@@ -20,14 +20,14 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:process_id, :job_id], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_failed_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_failed_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.text :error
       t.datetime :created_at, null: false
       t.index [:job_id], name: "index_solid_queue_failed_executions_on_job_id", unique: true, force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_jobs, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_jobs, if_not_exists: true do |t|
       t.string :queue_name, null: false
       t.string :class_name, null: false
       t.text :arguments
@@ -45,13 +45,13 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:scheduled_at, :finished_at], name: "index_solid_queue_jobs_for_alerting", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_pauses, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_pauses, if_not_exists: true do |t|
       t.string :queue_name, null: false
       t.datetime :created_at, null: false
       t.index [:queue_name], name: "index_solid_queue_pauses_on_queue_name", unique: true, force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_processes, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_processes, if_not_exists: true do |t|
       t.string :kind, null: false
       t.datetime :last_heartbeat_at, null: false
       t.bigint :supervisor_id
@@ -64,7 +64,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:supervisor_id], name: "index_solid_queue_processes_on_supervisor_id", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_ready_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_ready_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.string :queue_name, null: false
       t.integer :priority, default: 0, null: false
@@ -74,7 +74,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:queue_name, :priority, :job_id], name: "index_solid_queue_poll_by_queue", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_recurring_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_recurring_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.string :task_key, null: false
       t.datetime :run_at, null: false
@@ -83,7 +83,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:task_key, :run_at], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true, force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_recurring_tasks, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_recurring_tasks, if_not_exists: true do |t|
       t.string :key, null: false
       t.string :task, null: false
       t.text :schedule, null: false
@@ -96,7 +96,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:run_at], name: "index_solid_queue_recurring_tasks_on_run_at", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_scheduled_executions, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_scheduled_executions, if_not_exists: true do |t|
       t.bigint :job_id, null: false
       t.string :queue_name, null: false
       t.integer :priority, default: 0, null: false
@@ -106,7 +106,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:scheduled_at, :priority, :job_id], name: "index_solid_queue_dispatch_all", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_queue_semaphores, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_queue_semaphores, if_not_exists: true do |t|
       t.string :key, null: false
       t.integer :value, default: 1, null: false
       t.datetime :expires_at, null: false
@@ -117,7 +117,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:key], name: "index_solid_queue_semaphores_on_key", unique: true, force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_cable_messages, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_cable_messages, if_not_exists: true do |t|
       t.binary :channel, limit: 1024, null: false
       t.binary :payload, limit: 536870912, null: false
       t.datetime :created_at, null: false
@@ -127,7 +127,7 @@ class CreateSolidTables < ActiveRecord::Migration[8.0]
       t.index [:created_at], name: "index_solid_cable_messages_on_created_at", force: :cascade, if_not_exists: true
     end
 
-    create_table :solid_cache_entries, force: :cascade, if_not_exists: true do |t|
+    create_table :solid_cache_entries, if_not_exists: true do |t|
       t.binary :key, limit: 1024, null: false
       t.binary :value, limit: 536870912, null: false
       t.datetime :created_at, null: false
