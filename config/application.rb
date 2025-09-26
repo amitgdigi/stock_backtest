@@ -24,5 +24,6 @@ module StockBacktest
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.require_master_key = false
+    config.active_job.queue_adapter = :solid_queue
   end
 end
