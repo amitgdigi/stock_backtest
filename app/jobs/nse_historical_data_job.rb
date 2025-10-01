@@ -13,6 +13,7 @@ class NseHistoricalDataJob < ApplicationJob
 
   BATCH_DURATION = 4.months
   START_DATE = 5.years.ago.to_date
+  MAX_DATE = Date.today
 
   def perform(symbol)
     stock = Stock.find_or_create_by(ticker: symbol.upcase)
