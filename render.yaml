@@ -25,7 +25,7 @@ services:
     name: stock_backtest-worker
     env: docker
     dockerfilePath: ./Dockerfile
-    startCommand: bundle exec rails solid_queue:start
+    startCommand: bundle exec rake solid_queue:start
     envVars:
       - key: DATABASE_URL
         fromDatabase:
