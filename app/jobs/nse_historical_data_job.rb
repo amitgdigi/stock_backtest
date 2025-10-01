@@ -40,7 +40,7 @@ class NseHistoricalDataJob < ApplicationJob
       prices = extract_prices(data[:data], stock.id)
       save_prices(prices)
 
-      break if data[:data].size < 70
+      break unless Date.parse(data[:data]&.last[:mTIMESTAMP] || "#{MAX_DATE}") < MAX_DATE
 
       current_from = prices.last[:date] + 1.day
       current_to = current_from + BATCH_DURATION
