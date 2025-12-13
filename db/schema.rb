@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_21_192407) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_17_161314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,29 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_192407) do
     t.datetime "updated_at", null: false
     t.decimal "maximum_buy_amount", precision: 10, scale: 2
     t.index ["stock_id"], name: "index_backtests_on_stock_id"
+  end
+
+  create_table "ipo_stocks", force: :cascade do |t|
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.decimal "investment_amount", precision: 15, scale: 2, null: false
+    t.decimal "maximum_buy_amount", precision: 10, scale: 2
+    t.decimal "sell_profit_percentage", precision: 5, scale: 2, null: false
+    t.decimal "first_buy_percentage", precision: 5, scale: 2, null: false
+    t.decimal "buy_dip_percentage", precision: 5, scale: 2, null: false
+    t.decimal "reinvestment_percentage", precision: 5, scale: 2
+    t.decimal "total_amount", precision: 15, scale: 2
+    t.string "status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "total_bought_amount_for_stock", precision: 15, scale: 2
+  end
+
+  create_table "ipo_stocks_stocks", id: false, force: :cascade do |t|
+    t.bigint "ipo_stock_id", null: false
+    t.bigint "stock_id", null: false
+    t.index ["ipo_stock_id", "stock_id"], name: "index_ipo_stocks_stocks_on_ipo_stock_id_and_stock_id", unique: true
+    t.index ["stock_id", "ipo_stock_id"], name: "index_ipo_stocks_stocks_on_stock_id_and_ipo_stock_id"
   end
 
   create_table "multi_stocks", force: :cascade do |t|
@@ -224,7 +247,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_192407) do
     t.bigint "multi_stock_id"
     t.bigint "stock_id"
     t.decimal "total_amount", precision: 15, scale: 2
+    t.bigint "ipo_stock_id"
+    t.decimal "stock_amount", precision: 15, scale: 2
     t.index ["backtest_id"], name: "index_transactions_on_backtest_id"
+    t.index ["ipo_stock_id"], name: "index_transactions_on_ipo_stock_id"
     t.index ["multi_stock_id"], name: "index_transactions_on_multi_stock_id"
     t.index ["stock_id"], name: "index_transactions_on_stock_id"
   end
@@ -232,6 +258,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_192407) do
   add_foreign_key "backtests", "stocks"
   add_foreign_key "stock_prices", "stocks"
   add_foreign_key "transactions", "backtests"
+  add_foreign_key "transactions", "ipo_stocks"
   add_foreign_key "transactions", "multi_stocks"
   add_foreign_key "transactions", "stocks"
 end

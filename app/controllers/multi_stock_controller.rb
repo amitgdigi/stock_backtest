@@ -64,7 +64,12 @@ class MultiStockController < ApplicationController
   end
 
   def backtest
-    stock_params =stock_symbols_params
+
+    names = []
+    names << [ "FMCGIETF", "NIFTYBEES"]#, "MON100", "ITETF", "ITIETF", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "HDFCBSE500", "ITBEES", "SBIETFIT" ] 
+
+    names = names.flatten
+    stock_params = { "stock_symbols"=> names }
 
     service = ProcessMultiStockBacktestService.new(multi_stock_params.merge(stock_params))
 

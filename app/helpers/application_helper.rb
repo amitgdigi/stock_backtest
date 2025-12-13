@@ -4,7 +4,7 @@ module ApplicationHelper
     integer_part = parts[0]
     decimal_part = parts[1]
 
-    formatted_integer_part = integer_part.gsub(/(\d+?)(?=(\d\d)+(\d)(?!\d))/, '\\1,')
+    formatted_integer_part = integer_part&.gsub(/(\d+?)(?=(\d\d)+(\d)(?!\d))/, '\\1,')
 
     if decimal_part
       "#{formatted_integer_part}.#{decimal_part}"
