@@ -61,7 +61,8 @@ class IpoStockController < ApplicationController
       u_pnl_per:,
       max_amount_invested:,
       remains: ipo_stock.total_amount,
-      total_amount: ipo_stock.total_amount + portfolio
+      total_amount: ipo_stock.total_amount + portfolio,
+      monthly_profit: calculate_monthly_profit
     }
   end
 
@@ -70,6 +71,7 @@ class IpoStockController < ApplicationController
     names << [ "MON100", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "ITBEES", "ITETF", "ITIETF", "SBIETFIT" ] 
     names << [ "SBIETFIT" ] 
     names << [ "FMCGIETF", "NIFTYBEES", "MON100", "ITETF", "ITIETF", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "HDFCBSE500" ] 
+
 
     names = names.flatten.uniq
     stock_params = { "stock_symbols"=> names }
@@ -90,66 +92,127 @@ class IpoStockController < ApplicationController
 
   private
 
-  def calculate_portfolio
-    results = []
-    ipo_stock.transactions.order(:stock_id, :date, :id).group_by(&:stock).each do |stock, transactions|
-      transactions = transactions.sort_by { |t| [t.date, t.id] }
-      entry = { stock: stock.serialize }
-      price = stock.stock_prices.where("date <= ?", ipo_stock.end_date).order(date: :desc).first&.close_price || 0
-      unsold_transactions = transactions.last&.sell? ? [] : transactions.last&.collect_unsold_between(include_self: true) || []
-      entry[:invested_amount] = unsold_transactions.sum(&:amount)
-      entry[:final_shares] = unsold_transactions.sum(&:quantity)
-      entry[:portfolio] = (entry[:final_shares] * price)
+    def calculate_portfolio
+      results = []
+      ipo_stock.transactions.order(:stock_id, :date, :id).group_by(&:stock).each do |stock, transactions|
+        transactions = transactions.sort_by { |t| [t.date, t.id] }
+        entry = { stock: stock.serialize }
+        price = stock.stock_prices.where("date <= ?", ipo_stock.end_date).order(date: :desc).first&.close_price || 0
+        unsold_transactions = transactions.last&.sell? ? [] : transactions.last&.collect_unsold_between(include_self: true) || []
+        entry[:invested_amount] = unsold_transactions.sum(&:amount)
+        entry[:final_shares] = unsold_transactions.sum(&:quantity)
+        entry[:portfolio] = (entry[:final_shares] * price)
 
-      sold_transactions = transactions.select { |t| t.sell? && t.quantity > 0 }
-      entry[:pnl] = sold_transactions.present? ? ((transactions - unsold_transactions).sum { |t| t.sell? ? t.amount : -t.amount }) : 0
-      entry[:u_pnl] = (entry[:portfolio] - entry[:invested_amount]) || 0
-      entry[:charges] = (transactions.sum { |t| t.amount * T_CHARGE }.round(2)) + (sold_transactions.count * CHARGE)
-      entry[:u_pnl_per] = profit_percent(unsold_transactions, entry[:u_pnl]).round(2)
-      entry[:pnl_per] = profit_percent(transactions, entry[:pnl]).round(2)
-      entry[:transactions] = transactions.map(&:serialize)
-      results << entry
+        sold_transactions = transactions.select { |t| t.sell? && t.quantity > 0 }
+        entry[:pnl] = sold_transactions.present? ? ((transactions - unsold_transactions).sum { |t| t.sell? ? t.amount : -t.amount }) : 0
+        entry[:u_pnl] = (entry[:portfolio] - entry[:invested_amount]) || 0
+        entry[:charges] = (transactions.sum { |t| t.amount * T_CHARGE }.round(2)) + (sold_transactions.count * CHARGE)
+        entry[:u_pnl_per] = profit_percent(unsold_transactions, entry[:u_pnl]).round(2)
+        entry[:pnl_per] = profit_percent(transactions, entry[:pnl]).round(2)
+        entry[:transactions] = transactions.map(&:serialize)
+        results << entry
+      end
+      results
     end
-    results
-  end
 
-  def profit_percent(t, pnl)
-    return 0.0 if t.blank?
+    def calculate_monthly_profit
+      monthly_data = {}
 
-    min = t.min_by(&:total_amount)
-    max = t.max_by(&:total_amount)
-    min_amount = min.total_amount
-    max_amount = (max.total_amount + max.amount).round
-    investment = max_amount - min_amount
-    return 0.0 if investment.zero?
+      ipo_stock.transactions.order(:date).each do |txn|
+        month_key = txn.date.strftime("%B %Y")
+        monthly_data[month_key] ||= { pnl: 0, invested: 0, charges: 0, trades: 0 }
+      end
 
-    pnl / investment * 100
-  end
+      # Iterate through all stocks and their transactions (like in calculate_portfolio)
+      # For each completed trade (buy + sell), attribute the P&L to the month of the SELL transaction.
 
-  def ipo_stock
-    @_ipo_stock ||= IpoStock.find(params[:id])
-  end
+      monthly_results = Hash.new { |h, k| h[k] = { pnl: 0, charges: 0, invested: 0, count: 0 } }
 
-  def ipo_stock_params
-    params.require(:ipo_stock).permit(:start_date, :end_date, :total_amount, :maximum_buy_amount, :total_bought_amount_for_stock, :investment_amount, :buy_dip_percentage, :first_buy_percentage, :sell_profit_percentage, :reinvestment_percentage, symbols: [], stock_ids: [])
-  end
+      ipo_stock.transactions.order(:stock_id, :date, :id).group_by(&:stock).each do |stock, transactions|
+        transactions = transactions.sort_by { |t| [t.date, t.id] }
 
-  def stock_symbols_params
-    params.permit(stock_symbols: [], selected_ids: [])
-  end
+        # We need to track inventory to know cost basis
+        inventory = [] # Array of [price, quantity]
 
-  def default_backtest_attributes
-    last = IpoStock.last
-    {
-      start_date: last&.start_date || Date.current.beginning_of_month,
-      end_date: last&.end_date || Date.today,
-      investment_amount: last&.investment_amount&.to_i || 5000,
-      maximum_buy_amount: last&.maximum_buy_amount&.to_i || 10000,
-      first_buy_percentage: last&.first_buy_percentage&.to_i || 10,
-      buy_dip_percentage: last&.buy_dip_percentage&.to_i || 6,
-      reinvestment_percentage: last&.reinvestment_percentage&.to_i || 50,
-      sell_profit_percentage: last&.sell_profit_percentage&.to_i || 40,
-      total_bought_amount_for_stock: last&.total_bought_amount_for_stock&.to_i || 30000
-    }
-  end
+        transactions.each do |txn|
+          month_key = txn.date.strftime("%b %Y")
+          monthly_results[month_key][:charges] += (txn.amount * T_CHARGE).round(2)
+
+          if txn.buy?
+            inventory << { price: txn.price, quantity: txn.quantity, date: txn.date }
+            monthly_results[month_key][:invested] += txn.amount
+          elsif txn.sell?
+            monthly_results[month_key][:charges] += CHARGE
+            monthly_results[month_key][:count] += 1
+
+            qty_to_sell = txn.quantity
+            cost_basis = 0
+
+            # FIFO matching
+            while qty_to_sell > 0 && inventory.any?
+              batch = inventory.first
+              if batch[:quantity] <= qty_to_sell
+                cost_basis += batch[:quantity] * batch[:price]
+                qty_to_sell -= batch[:quantity]
+                inventory.shift
+              else
+                cost_basis += qty_to_sell * batch[:price]
+                batch[:quantity] -= qty_to_sell
+                qty_to_sell = 0
+              end
+            end
+
+            # If we sold more than we have (should not happen in valid data), ignore excess
+            if qty_to_sell == 0
+              revenue = txn.amount
+              pnl = revenue - cost_basis
+              monthly_results[month_key][:pnl] += pnl
+            end
+          end
+        end
+      end
+
+      # Sort by date
+      monthly_results.sort_by { |k, v| Date.parse(k) }.to_h
+    end
+
+    def profit_percent(t, pnl)
+      return 0.0 if t.blank?
+
+      min = t.min_by(&:total_amount)
+      max = t.max_by(&:total_amount)
+      min_amount = min.total_amount
+      max_amount = (max.total_amount + max.amount).round
+      investment = max_amount - min_amount
+      return 0.0 if investment.zero?
+
+      pnl / investment * 100
+    end
+
+    def ipo_stock
+      @_ipo_stock ||= IpoStock.find(params[:id])
+    end
+
+    def ipo_stock_params
+      params.require(:ipo_stock).permit(:start_date, :end_date, :total_amount, :maximum_buy_amount, :total_bought_amount_for_stock, :investment_amount, :buy_dip_percentage, :first_buy_percentage, :sell_profit_percentage, :reinvestment_percentage, symbols: [], stock_ids: [])
+    end
+
+    def stock_symbols_params
+      params.permit(stock_symbols: [], selected_ids: [])
+    end
+
+    def default_backtest_attributes
+      last = IpoStock.last
+      {
+        start_date: last&.start_date || Date.current.beginning_of_month,
+        end_date: last&.end_date || Date.today,
+        investment_amount: last&.investment_amount&.to_i || 5000,
+        maximum_buy_amount: last&.maximum_buy_amount&.to_i || 10000,
+        first_buy_percentage: last&.first_buy_percentage&.to_i || 10,
+        buy_dip_percentage: last&.buy_dip_percentage&.to_i || 6,
+        reinvestment_percentage: last&.reinvestment_percentage&.to_i || 50,
+        sell_profit_percentage: last&.sell_profit_percentage&.to_i || 40,
+        total_bought_amount_for_stock: last&.total_bought_amount_for_stock&.to_i || 30000
+      }
+    end
 end
