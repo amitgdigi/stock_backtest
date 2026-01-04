@@ -51,7 +51,7 @@ class IpoStockController < ApplicationController
       portfolio:,
       pnl:,
       u_pnl:,
-      transactions: ipo_stock.transactions.order(:date, total_amount: :desc).map(&:serialize),
+      transactions: ipo_stock.transactions.order(Arel.sql("date, kind DESC, (CASE WHEN kind=0 THEN total_amount END) DESC, (CASE WHEN kind=1 THEN total_amount END) ASC")).map(&:serialize),
       final_shares:,
       invested_amount:,
       charges:,
@@ -68,11 +68,15 @@ class IpoStockController < ApplicationController
 
   def backtest
     names = []
-    names << [ "MON100", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "ITBEES", "ITETF", "ITIETF", "SBIETFIT" ] 
-    names << [ "SBIETFIT" ] 
-    names << [ "FMCGIETF", "NIFTYBEES", "MON100", "ITETF", "ITIETF", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "HDFCBSE500" ] 
-
-
+    names << StockList::ETF_UNDER_20L
+    names << StockList::ETF_UNDER_20L_50L
+    names << StockList::ETF_UNDER_50L_1CR
+    names << StockList::ETF_10_1
+    names << StockList::ETF_100_10
+    names << StockList::ETF_ABOVE_100
+    names << StockList::MIX_1
+    names << StockList::MIX_2
+    names << StockList::MIX_3
     names = names.flatten.uniq
     stock_params = { "stock_symbols"=> names }
 

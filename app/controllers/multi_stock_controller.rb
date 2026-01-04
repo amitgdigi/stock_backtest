@@ -66,7 +66,7 @@ class MultiStockController < ApplicationController
   def backtest
 
     names = []
-    names << [ "FMCGIETF", "NIFTYBEES"]#, "MON100", "ITETF", "ITIETF", "AXISGOLD", "BSLGOLDETF", "HDFCSML250", "HDFCBSE500", "ITBEES", "SBIETFIT" ] 
+    names << StockList::MS_ACTIVE
 
     names = names.flatten
     stock_params = { "stock_symbols"=> names }
