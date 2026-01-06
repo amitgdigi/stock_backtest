@@ -14,6 +14,12 @@ Rails.application.routes.draw do
       post :backtest
     end
   end
+  resources :ipo_stock, only: [ :index, :create, :show ] do
+    collection do
+      get :search_stock
+      post :backtest
+    end
+  end
 
   get "stocks/search", to: "stocks#search"
   get "stocks/ipo", to: "stocks#ipo"
