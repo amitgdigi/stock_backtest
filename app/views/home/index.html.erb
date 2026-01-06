@@ -6,22 +6,27 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
     <!-- Strategy 1 -->
-    <%= link_to 'Averaging Down with Fixed Profit', new_backtest_path, class: "bg-blue-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-blue-700 transition" %>
+    <%= link_to 'Averaging Down with Fixed Profit', new_backtest_path, class: "inline-block w-full bg-blue-600 text-white px-6 py-4 rounded-xl text-center shadow-md hover:shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition" %>
 
     <!-- Strategy 2 -->
     <%= link_to 'Ladder Strategy', new_backtests_ladder_path,
     #  backtests_path(strategy: 'rsi_reversal'), 
-     class: "bg-green-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-green-700 transition" %>
+     class: "inline-block w-full bg-green-600 text-white px-6 py-4 rounded-xl text-center shadow-md hover:shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition" %>
 
     <!-- Strategy 3 -->
     <%= link_to 'List out IPOs', stocks_ipo_path,
     #  backtests_path(strategy: 'breakout'), 
-     class: "bg-purple-600 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-purple-700 transition" %>
+     class: "inline-block w-full bg-purple-600 text-white px-6 py-4 rounded-xl text-center shadow-md hover:shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition" %>
 
     <!-- Strategy 4 -->
     <%= link_to 'Multi Stock Backtest', multi_stock_index_path,
     #  backtests_path(strategy: 'bollinger'), 
-     class: "bg-yellow-500 text-white px-6 py-4 rounded-xl text-center shadow hover:bg-yellow-600 transition" %>
+     class: "inline-block w-full bg-yellow-500 text-white px-6 py-4 rounded-xl text-center shadow-md hover:shadow-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition" %>
+
+    <!-- Strategy 5 -->
+    <%= link_to 'IPO Stock Backtest', ipo_stock_index_path,
+    #  backtests_path(strategy: 'bollinger'), 
+     class: "inline-block w-full bg-green-600 text-white px-6 py-4 rounded-xl text-center shadow-md hover:shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition" %>
   </div>
 
   <div class="mt-12 text-sm text-gray-500">
