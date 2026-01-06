@@ -1,0 +1,14 @@
+<% stocks.each do |stock| %>
+  <div class="flex items-center">
+    <input type="checkbox" 
+      name="stock_symbols_temp[]" 
+      value="<%= stock.ticker %>" 
+      id="stock_<%= stock.ticker %>" 
+      data-stock-search-target="checkbox"
+      data-action="change->stock-search#toggleSelection"
+      class="mr-2" />
+    <label for="stock_<%= stock.ticker %>" class="text-sm px-1 pt-2">
+      <%= stock.ticker %> - <%= stock.name %>
+    </label>
+  </div>
+<% end %>

@@ -35,6 +35,7 @@ class Transaction < ApplicationRecord
   belongs_to :backtest, optional: true
   belongs_to :multi_stock, optional: true
   belongs_to :stock, optional: true
+  belongs_to :ipo_stock, optional: true
 
   validates :kind, :date, :price, :quantity, :amount, presence: true
   validates :kind, inclusion: { in: %w[buy sell] }
@@ -60,12 +61,12 @@ class Transaction < ApplicationRecord
 
   def collect_unsold_between(include_self: false)
     last_sell = self.class
-                   .where(multi_stock_id: multi_stock_id, stock_id: stock_id, kind: "sell")
+                   .where(multi_stock_id: multi_stock_id, stock_id: stock_id, ipo_stock_id: ipo_stock_id, kind: "sell")
                    .where("created_at < ?", created_at)
                    .order(created_at: :desc)
                    .first
 
-    scope = self.class.where(multi_stock_id:, stock_id:)
+    scope = self.class.where(multi_stock_id:, stock_id:, ipo_stock:)
     if last_sell.present?
       scope = scope.where("created_at > ? AND created_at < ?", last_sell.created_at, created_at)
     else
@@ -87,9 +88,11 @@ class Transaction < ApplicationRecord
       open:,
       multi_stock_id:,
       stock_id:,
+      ipo_stock_id:,
       stock_name: stock&.name,
       symbol: stock&.ticker,
-      remains: total_amount
+      remains: total_amount,
+      stock_amount: stock_amount
     }
   end
 end

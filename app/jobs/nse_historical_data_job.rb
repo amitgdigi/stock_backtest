@@ -19,6 +19,7 @@ class NseHistoricalDataJob < ApplicationJob
     stock = Stock.find_or_create_by(ticker: symbol.upcase)
 
     fetch_symbol_name(stock) if stock.name.nil? || stock.listing_date.nil?
+    return { fetched: true, notice: "Stock not found" } if stock.ticker.blank?
     return { fetched: true, notice: "Prices were present already" } if stock&.stock_prices.present?
 
     current_from = [ START_DATE, stock.listing_date.to_date ].max
@@ -32,18 +33,15 @@ class NseHistoricalDataJob < ApplicationJob
         type: "priceVolumeDeliverable",
         series: "EQ" # EQ, BE
       }, headers: HEADERS)
-
       data = JSON.parse(response.body, symbolize_names: true)
-      break unless data[:data].present?
+      break unless data[:data].present? || Date.parse("#{current_to}") < MAX_DATE
 
       Rails.logger.info "\n📆 Fetching: #{current_from} → #{current_to} | Records: #{data[:data].size}"
 
       prices = extract_prices(data[:data], stock.id)
       save_prices(prices)
-
-      break unless Date.parse(data[:data]&.last[:mTIMESTAMP] || "#{MAX_DATE}") < MAX_DATE
-
-      current_from = prices.last[:date] + 1.day
+      break unless Date.parse((data[:data]&.last&.dig(:mTIMESTAMP) || current_to).to_s) < MAX_DATE
+      current_from = (prices.last&.[](:date)&.+1.day) || (current_from + BATCH_DURATION)
       current_to = current_from + BATCH_DURATION
     end
   rescue => e
